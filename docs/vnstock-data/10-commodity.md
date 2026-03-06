@@ -21,6 +21,8 @@ commodity = CommodityPrice(show_log=True)
 
 - `start` (str, optional): Ngày bắt đầu mặc định (format: "YYYY-MM-DD")
 - `end` (str, optional): Ngày kết thúc mặc định (format: "YYYY-MM-DD")
+- `length` (str|int, optional): Khoảng thời gian mặc định lấy dữ liệu. Mặc định là `1Y` (1 năm gần nhất tính từ ngày hnay). Xem chi tiết cấu trúc tại [01-overview.md#tham-số-thời-gian-tương-đối-length](01-overview.md#tham-số-thời-gian-tương-đối-length).
+- `show_log` (bool, default=False): Bật log debug
 
 **Lưu ý**: Chỉ **SPL** hỗ trợ Commodity.
 
@@ -29,11 +31,11 @@ commodity = CommodityPrice(show_log=True)
 ### Vàng
 
 ```python
-# Vàng Việt Nam (mua/bán)
-df = commodity.gold_vn(start="2025-11-01", end="2025-12-02")
+# Vàng Việt Nam (mua/bán) - 3 tháng gần nhất
+df = commodity.gold_vn(length="3M")
 
-# Vàng thế giới
-df = commodity.gold_global(start="2025-11-01", end="2025-12-02")
+# Vàng thế giới - 100 nến
+df = commodity.gold_global(length="100b")
 ```
 
 **Trả về**: 
@@ -52,14 +54,14 @@ time
 ### Năng Lượng
 
 ```python
-# Xăng/dầu Việt Nam
-df = commodity.gas_vn(start="2025-11-01", end="2025-12-02")
+# Xăng/dầu Việt Nam - mặc định 1 năm
+df = commodity.gas_vn()
 
-# Dầu thô thế giới
-df = commodity.oil_crude(start="2025-11-01", end="2025-12-02")
+# Dầu thô thế giới - 3 tháng
+df = commodity.oil_crude(length="3M")
 
-# Khí thiên nhiên
-df = commodity.gas_natural(start="2025-11-01", end="2025-12-02")
+# Khí thiên nhiên - 30 ngày
+df = commodity.gas_natural(length="30D")
 ```
 
 **Trả về**:
@@ -80,16 +82,16 @@ time
 
 ```python
 # Than cốc
-df = commodity.coke(start="2025-11-01", end="2025-12-02")
+df = commodity.coke()
 
-# Thép D10 Việt Nam
-df = commodity.steel_d10(start="2025-11-01", end="2025-12-02")
+# Thép D10 Việt Nam - 3 tháng
+df = commodity.steel_d10(length="3M")
 
 # Quặng sắt thế giới
-df = commodity.iron_ore(start="2025-11-01", end="2025-12-02")
+df = commodity.iron_ore()
 
 # Thép HRC thế giới
-df = commodity.steel_hrc(start="2025-11-01", end="2025-12-02")
+df = commodity.steel_hrc()
 ```
 
 **Trả về**: DataFrame với cột `open`, `high`, `low`, `close`, `volume` (float64)
@@ -106,28 +108,31 @@ time
 ### Nông Sản
 
 ```python
-# Phân bón Urê
-df = commodity.fertilizer_ure(start="2025-11-01", end="2025-12-02")
+# Phân bón Urê (Mặc định 1Y)
+df = commodity.fertilizer_ure()
 
 # Đậu nành
-df = commodity.soybean(start="2025-11-01", end="2025-12-02")
+df = commodity.soybean(length="3Y")
 
 # Ngô
-df = commodity.corn(start="2025-11-01", end="2025-12-02")
+df = commodity.corn()
 
 # Đường
-df = commodity.sugar(start="2025-11-01", end="2025-12-02")
+df = commodity.sugar()
 
 # Lợn (heo) miền Bắc Việt Nam
-df = commodity.pork_north_vn(start="2025-11-01", end="2025-12-02")
+df = commodity.pork_north_vn(length="100b")
 
 # Lợn (heo) Trung Quốc
-df = commodity.pork_china(start="2025-11-01", end="2025-12-02")
+df = commodity.pork_china()
 ```
 
-**Tham Số**:
+**Tham Số Chung Của Các Hàm**:
 - `start` (str, optional): Ngày bắt đầu (format: "YYYY-MM-DD")
 - `end` (str, optional): Ngày kết thúc (format: "YYYY-MM-DD")
+- `length` (str|int, optional): Khoảng thời gian tương đối (VD: `"30D"`, `"3M"`, `"1Y"` hoặc `"100b"`). Xem [Định dạng length](01-overview.md#tham-số-thời-gian-tương-đối-length).
+
+*Lưu ý*: Với mỗi method, nếu các đối số khởi tạo này bỏ trống, cấu hình khởi tạo của chính class `CommodityPrice` (Mặc định `1Y`) sẽ được áp dụng.
 
 **Trả về**: DataFrame với cột OHLCV (`open`, `high`, `low`, `close`, `volume` - float64)
 
@@ -148,24 +153,24 @@ import matplotlib.pyplot as plt
 
 commodity = CommodityPrice()
 
-# Lấy giá vàng
-gold_vn = commodity.gold_vn(start="2025-11-01", end="2025-12-02")
+# Lấy giá vàng 30 ngày qua
+gold_vn = commodity.gold_vn(length="30D")
 print("Giá vàng Việt Nam gần đây:")
 print(f"Giá mua hiện tại: {gold_vn['buy'].iloc[-1]:,.0f} VND/chỉ")
 print(f"Giá bán hiện tại: {gold_vn['sell'].iloc[-1]:,.0f} VND/chỉ")
 
-# Lấy giá dầu
-oil = commodity.oil_crude(start="2025-11-01", end="2025-12-02")
+# Lấy giá dầu 1 năm
+oil = commodity.oil_crude()
 print(f"\nGiá dầu thô gần đây:")
 print(f"Giá close: {oil['close'].iloc[-1]:.2f} USD/barrel")
 
-# Lấy giá thép
-steel = commodity.steel_hrc(start="2025-11-01", end="2025-12-02")
+# Lấy giá thép 6 tháng
+steel = commodity.steel_hrc(length="6M")
 print(f"\nGiá thép HRC gần đây:")
 print(f"Giá close: {steel['close'].iloc[-1]:,.0f} USD/tấn")
 
-# Lấy giá lợn
-pork = commodity.pork_north_vn(start="2025-11-01", end="2025-12-02")
+# Lấy giá lợn mốc 1 năm
+pork = commodity.pork_north_vn()
 print(f"\nGiá lợn Bắc Việt Nam gần đây:")
 print(f"Giá close: {pork['close'].iloc[-1]:,.0f} VND/kg")
 

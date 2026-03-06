@@ -119,6 +119,26 @@ df_price = quote.history(start="2024-01-01", end="2024-12-31", interval="1D")
 - Cần thay đổi import khi chuyển nguồn
 - Cần nhớ địa chỉ import của của nguồn trong thư viện
 
+## Tham Số Thời Gian Tương Đối (`length`)
+
+Trong nhiều hàm truy xuất dữ liệu (như `Macro`, `CommodityPrice`, `Quote`,...), thư viện cung cấp cờ `length` để thiết lập khoảng thời gian lấy dữ liệu tương đối so với hiện tại, thay vì phải truyền `start` và `end` cố định. 
+
+Hệ thống cung cấp cơ chế giải mã linh hoạt cho `length`. Bạn có thể truyền các định dạng sau:
+
+1. **Số ngày chính xác (Integer/Numeric String)**
+   - Ví dụ: `150`, `"150"` (Truy xuất dữ liệu 150 ngày qua).
+2. **Preset Chuẩn (Milestones)**
+   - Các mốc tính bằng ngày được định nghĩa sẵn:
+     - **Tuần**: `"1W"`, `"2W"`, `"3W"`, `"6W"`
+     - **Tháng**: `"1M"`, `"2M"`, `"3M"`, `"4M"`, `"5M"`, `"6M"`, `"9M"`, `"18M"`
+     - **Năm**: `"1Y"`, `"2Y"`, `"3Y"`, `"5Y"`
+3. **Cấu Trúc Động (Dynamic Parsing)**
+   - Bạn có thể tùy biến tổ hợp `<Số><Đơn Vị>`:
+     - `D` (Ngày), `W` (Tuần), `M` (Tháng ~30 ngày), `Q` (Quý ~90 ngày), `Y` (Năm ~365 ngày).
+     - Ví dụ: `"100W"` (100 tuần), `"4Q"` (4 quý), `"10Y"` (10 năm).
+4. **Định dạng số nến (Bars)**
+   - Khai báo số lượng nến/thanh dữ liệu với hậu tố `b` (Ví dụ: `"100b"` hoặc `100` trong một số context chuyên biệt của Quote Intraday/Lịch sử). Với Macro và Commodity, hệ thống sẽ tự động chuyển đổi sang số ngày tương ứng để duy trì tính tương thích.
+
 ### Các Nguồn Dữ Liệu Chính
 
 | Tên | Code | Mô Tả | Ưu Điểm |

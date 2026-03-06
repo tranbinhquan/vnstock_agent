@@ -1,5 +1,7 @@
 # Macro - Kinh Tế Vĩ Mô
 
+> ⚠️ **Migration Notice**: Lớp `Macro` này sẽ chuyển đổi sang [Unified UI](./14-unified-ui.md) structure sau ngày **31/8/2026**. Vui lòng bắt đầu sử dụng cấu trúc mới: `Macro().economy()`, `Macro().currency()`, `Macro().commodity()` thay vì các method trực tiếp. Nếu code hiện tại của bạn đang sử dụng cấu trúc cũ, bạn có thể tiếp tục dùng đến hết 31/8/2026.
+
 Lớp `Macro` cung cấp dữ liệu kinh tế vĩ mô của Việt Nam từ MayBank (MBK).
 
 ## Khởi Tạo
@@ -20,6 +22,11 @@ macro = Macro(show_log=True)
 ### Tham Số Khởi Tạo
 
 - `random_agent` (bool, default=False): Sử dụng random user agent để tránh bị block
+- `show_log` (bool, default=False): Bật log debug
+
+**Đặc tả mới từ bản cập nhật**:
+- Các hàm truy xuất dữ liệu nay cung cấp tùy chọn tham số `length` (Khoảng thời gian tương đối như `'1Y'`, `'3M'`, `'30D'`, `'100b'`) làm mặc định thay vì bắt buộc truyền `start` và `end`.
+- Nếu không truyền tham số nào, dữ liệu mặt định trả về là **1 năm (`1Y`)**.
 
 **Lưu ý**: Chỉ **MBK** hỗ trợ Macro.
 
@@ -36,10 +43,13 @@ df = macro.gdp(start="2020-01", end="2025-12", period="year")
 ```
 
 **Tham Số**:
-- `start` (str): Ngày bắt đầu (format: "YYYY-MM"). Default: "2015-01"
-- `end` (str): Ngày kết thúc (format: "YYYY-MM"). Default: "2025-04"
+- `start` (str, optional): Ngày bắt đầu (format: "YYYY-MM"). 
+- `end` (str, optional): Ngày kết thúc (format: "YYYY-MM"). 
+- `length` (str|int, optional): Khoảng thời gian tương đối (ví dụ: `90` ngày, `'3Y'`, `'100b'`). Xem chi tiết format tại [01-overview.md#tham-s-thi-gian-tng-i-length](01-overview.md#tham-số-thời-gian-tương-đối-length).
 - `period` (str): "quarter" hoặc "year". Default: "quarter"
 - `keep_label` (bool): Giữ lại cột label gốc. Default: False
+
+*Lưu ý*: Nếu không cung cấp `start`, `end`, hay `length`, hàm lấy mặc định `length="1Y"`.
 
 **Trả về**: DataFrame với cột: `last_updated`, `group_name`, `name`, `value` (float64), `unit`, `source`, `report_type`
 
@@ -63,9 +73,12 @@ df = macro.cpi(start="2020-01", end="2025-12", period="year")
 ```
 
 **Tham Số**:
-- `start` (str): Ngày bắt đầu (format: "YYYY-MM"). Default: "2015-01"
-- `end` (str): Ngày kết thúc (format: "YYYY-MM"). Default: "2025-04"
+- `start` (str, optional): Ngày bắt đầu (format: "YYYY-MM"). 
+- `end` (str, optional): Ngày kết thúc (format: "YYYY-MM"). 
+- `length` (str|int, optional): Khoảng thời gian tương đối. Xem [Định dạng length](01-overview.md#tham-số-thời-gian-tương-đối-length).
 - `period` (str): "month" hoặc "year". Default: "month"
+
+*Lưu ý*: Nếu không cung cấp `start`, `end`, hay `length`, hàm lấy mặc định `length="1Y"`.
 
 **Trả về**: DataFrame với cột: `last_updated`, `name`, `value` (float64), `unit`, `source`
 
@@ -85,8 +98,9 @@ df = macro.industry_prod(start="2023-01", end="2025-12", period="month")
 ```
 
 **Tham Số**:
-- `start` (str): Ngày bắt đầu (format: "YYYY-MM")
-- `end` (str): Ngày kết thúc (format: "YYYY-MM")
+- `start` (str, optional): Ngày bắt đầu (format: "YYYY-MM")
+- `end` (str, optional): Ngày kết thúc (format: "YYYY-MM")
+- `length` (str|int, optional): Khoảng thời gian tương đối. Xem [Định dạng length](01-overview.md#tham-số-thời-gian-tương-đối-length).
 - `period` (str): "month" hoặc "year"
 
 **Trả về**: DataFrame chỉ số sản xuất công nghiệp
@@ -141,9 +155,12 @@ df = macro.exchange_rate(start="2025-11-01", end="2025-12-02", period="day")
 ```
 
 **Tham Số**:
-- `start` (str): Ngày bắt đầu (format: "YYYY-MM-DD" cho period="day" hoặc "YYYY-MM" cho period="month")
-- `end` (str): Ngày kết thúc (cùng format)
+- `start` (str, optional): Ngày bắt đầu (format: "YYYY-MM-DD" cho period="day" hoặc "YYYY-MM" cho period="month")
+- `end` (str, optional): Ngày kết thúc (cùng format)
+- `length` (str|int, optional): Khoảng thời gian tương đối. Xem [Định dạng length](01-overview.md#tham-số-thời-gian-tương-đối-length).
 - `period` (str): "day", "month", hoặc "year". Default: "day"
+
+*Lưu ý*: Nếu không truyền `start`, `end`, hoặc `length`, hàm tự quy định `length="1Y"`.
 
 **Trả về**: DataFrame với cột: `last_updated`, `name` (tên tỷ giá), `value` (float64), `unit`, `source`
 
@@ -155,6 +172,54 @@ report_time
 2025-11-29    2025-11-28                    Liên ngân hàng      NaN  VNĐ/USD  Ngân hàng Nhà nước Việt Nam
 2025-11-29    2025-11-28  Tỷ giá trung tâm (từ 04/01/2016)  25155.0  VNĐ/USD                         None
 ```
+
+### interest_rate() - Lãi Suất Định Cố & Doanh Số
+
+```python
+# Lãi suất theo ngày dạng pivot (wide table)
+df = macro.interest_rate(length="30D", period="day")
+
+# Lãi suất định dạng long (flat table)
+df = macro.interest_rate(length="30D", period="day", format="long")
+
+# Lãi suất theo năm
+df = macro.interest_rate(start="2024-01", end="2025-12", period="year")
+```
+
+**Tham Số**:
+- `start` (str, optional): Ngày bắt đầu (format: "YYYY-MM-DD" cho period="day" hoặc "YYYY-MM" cho period="year").
+- `end` (str, optional): Ngày kết thúc (cùng format với start).
+- `length` (str|int, optional): Khoảng thời gian tương đối. Default: `"1Y"`. Xem [Định dạng length](01-overview.md#tham-số-thời-gian-tương-đối-length).
+- `period` (str): "day" hoặc "year". Default: "day"
+- `format` (str): "pivot" hoặc "long". 
+  - **pivot**: Xoay trục cột, tạo MultiIndex DataFrame (wide format) - dễ đọc
+  - **long**: Định dạng raw flat table - phù hợp cho xử lý dữ liệu
+  - Default: "pivot"
+
+**Trả về**: 
+- `format="pivot"`: DataFrame với MultiIndex (group_name, name) trên cột - easy-to-read wide format
+- `format="long"`: DataFrame flat với cột: `last_updated`, `group_name`, `name`, `value` (float64), `unit`, `source`
+
+**Ví dụ Pivot Format** (3 dòng gần nhất):
+```
+group_name   Doanh số                      ... Lãi suất bình quân liên ngân hàng (%/năm)
+name         1 tháng    1 tuần    2 tuần   ...                                 6 tháng   9 tháng Qua đêm
+report_time                                ...                                                          
+2026-02-26     4201.0   92459.0   12220.0  ...                                      8.00    7.82    2.83
+2026-02-27     3262.0   39565.0    8875.0  ...                                      7.80    7.82    4.70
+2026-03-02     2280.0    6420.0    2615.0  ...                                      7.80    7.82   11.21
+```
+
+**Ví dụ Long Format** (3 dòng gần nhất):
+```
+             last_updated                            group_name                name    value unit             source
+report_time                                                                                                       
+2026-02-26    2026-02-26                              Doanh số              1 tháng   4201.0   Tr   Ngân hàng Nhà nước
+2026-02-26    2026-02-26  Lãi suất bình quân liên...                      Qua đêm    2.83    %   Ngân hàng Nhà nước
+2026-02-27    2026-02-27                              Doanh số              1 tuần  39565.0   Tr   Ngân hàng Nhà nước
+```
+
+*Lưu ý*: Nếu không cung cấp `start`, `end`, hay `length`, hàm lấy mặc định `length="1Y"`.
 
 ### population_labor() - Dân Số & Lao Động
 
