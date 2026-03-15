@@ -225,6 +225,52 @@ Nếu lỡ nhập sai API Key lúc cài đặt, bạn có thể reset như sau:
 > [!TIP]
 > Cách tốt nhất là luôn kích hoạt môi trường ảo (`source ~/.venv/bin/activate`) trước khi chạy bất kỳ lệnh nào. Khi đã activate, lệnh `python` sẽ tự động trỏ đúng vào phiên bản của môi trường ảo.
 
+### 🔴 Lỗi 9: "error: externally-managed-environment" trên Linux/macOS
+Lỗi này xảy ra khi bạn cố gắng cài đặt thư viện (như `vnstock_installer`) bằng `pip` vào môi trường Python global của hệ thống trên một số bản phân phối Linux hoặc macOS mới.
+
+*   **Dấu hiệu**: Báo lỗi `error: externally-managed-environment` khi chạy lệnh cài đặt:
+    ```text
+    error: externally-managed-environment
+
+    × This environment is externally managed
+    ╰─> To install Python packages system-wide, try apt install
+        python3-xyz, where xyz is the package you are trying to
+        install.
+    ```
+*   **Nguyên nhân**: Hệ điều hành khóa môi trường Python mặc định để tránh việc `pip` cài gói trực tiếp làm xung đột các package của hệ thống.
+*   **Cách khắc phục**: Cần tạo một môi trường ảo (virtual environment) riêng cho dự án, rồi mới chạy lệnh cài đặt:
+    ```bash
+    # 1. Tạo môi trường ảo có tên .venv trong thư mục hiện tại
+    python3 -m venv .venv
+    
+    # 2. Kích hoạt môi trường ảo
+    source .venv/bin/activate
+    
+    # 3. Chạy lệnh cài đặt lại vnstock_installer
+    pip install --extra-index-url https://vnstocks.com/api/simple vnstock_installer
+    ```
+
+### 🔴 Lỗi 10: "Cài đặt thất bại" trên GUI Installer
+Khi sử dụng trình cài đặt giao diện đồ họa (`vnstock-installer`), bạn có thể gặp thông báo "Cài đặt thất bại". 
+
+*   **Dấu hiệu**: Cửa sổ trình duyệt hoặc ứng dụng báo lỗi đỏ, trong khi Terminal/Command Prompt báo thiếu thư viện (ví dụ: `No module named 'pandas'`).
+    ```text
+    2026-03-15 23:04:43,298 - vnstock_installer - INFO - Vnstock Installer v3.1.1 starting...
+    Opening in Chrome...
+    2026-03-15 23:05:25,863 - vnstock_installer.ui - ERROR - Failed to import vnai after bootstrap: No module named 'pandas'
+    ```
+*   **Nguyên nhân**: Môi trường hiện tại thiếu các gói thư viện phụ thuộc (dependencies) cần thiết để khởi chạy bộ công cụ.
+*   **Cách khắc phục**:
+    1.  **Đóng trình cài đặt**: Tắt cửa sổ trình duyệt/giao diện đang hiển thị hoặc nhấn `Ctrl + C` tại Terminal để dừng chương trình.
+    2.  **Cài đặt môi trường**: Chạy lệnh sau để cài đặt đầy đủ các gói phụ thuộc:
+        ```bash
+        pip install -r https://vnstocks.com/files/requirements.txt
+        ```
+    3.  **Chạy lại installer**: Sau khi cài xong, nhấn phím mũi tên lên `↑` trong Terminal để nạp lại lệnh và nhấn `Enter` để khởi động lại giao diện cài đặt:
+        ```bash
+        vnstock-installer
+        ```
+
 ## 4. Xác Minh Cài Đặt (Verification)
 
 Sau khi cài xong, làm sao biết đã đủ chưa?
@@ -296,3 +342,39 @@ wget https://vnstocks.com/files/vnstock-cli-installer.run
 chmod +x vnstock-cli-installer.run
 ./vnstock-cli-installer.run
 ```
+
+## 6. Câu hỏi thường gặp (FAQ)
+
+### ❓ "Tôi đã tài trợ rồi nhưng sao nhập API Key vẫn báo dùng phiên bản miễn phí?"
+Đây là câu hỏi khá thường gặp từ các bạn mới tham gia gói tài trợ của Vnstock.
+
+**Dấu hiệu nhận biết:** Khi chạy code, bạn thấy thông báo xác nhận đã lưu API Key nhưng hệ thống vẫn báo đang dùng bản Community:
+```text
+✓ API key đã được lưu thành công! (API key saved successfully!)
+Bạn đang sử dụng Phiên bản cộng đồng (60 requests/phút)
+(You are using Community version - 60 requests/minute)
+
+Để tham gia gói thành viên tài trợ (To join sponsor membership):
+  Truy cập: https://vnstocks.com/insiders-program
+✓ API key đã được lưu thành công! vnst***1234b
+✓ Bạn đang sử dụng Phiên bản cộng đồng (60 requests/phút)
+```
+
+**Nguyên nhân gốc rễ:** Nhiều người dùng lầm tưởng rằng chỉ cần nhập API Key thì thư viện `vnstock` đang dùng sẽ tự động "nâng cấp" lên bản tài trợ. Tuy nhiên, thực tế là:
+1.  Vnstock có 2 thư viện riêng biệt: `vnstock` (Miễn phí) và `vnstock_data` (Sponsor).
+2.  Bản miễn phí `vnstock` sẽ luôn báo "Community version" bất kể bạn có API Key hay chưa (API Key ở bản này chủ yếu để chuẩn bị cho các đợt cập nhật tương lai).
+
+**Cách khắc phục:** Bạn cần cài đặt thư viện dành riêng cho nhà tài trợ thông qua `vnstock-installer` (GUI hoặc CLI), sau đó đổi tên thư viện trong câu lệnh import từ `vnstock` thành `vnstock_data`.
+
+```python
+# ❌ Sai: Vẫn dùng bản miễn phí dù đã lưu API Key
+from vnstock import Listing, Quote
+
+# ✅ Đúng: Chuyển sang dùng bản tài trợ (sau khi đã cài vnstock_data)
+from vnstock_data import Listing, Quote
+```
+
+Về cơ bản, bạn chỉ cần một thao tác **Find & Replace**: tìm `vnstock` và thay thế bằng `vnstock_data` trong dự án của mình.
+
+> [!NOTE]
+> Trong tương lai, `vnstock_data` có thể được tích hợp trực tiếp như một add-on của `vnstock` để tiện sử dụng hơn khi cấu trúc schema dữ liệu chuẩn hoá thế hệ tiếp theo được giới thiệu.

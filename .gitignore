@@ -4,8 +4,9 @@ website docs
 vnstock_data
 vnstock/
 # .agent/
-.agent/skills/vnstock-document-generator/
-.agent/skills/power-agent-creator/
+.agents/skills/vnstock-document-generator/
+.agents/skills/power-agent-creator/
+/dev_notes/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
