@@ -13,18 +13,22 @@ Tài liệu này mô tả chi tiết tất cả các crawler và cách sử dụ
 ```python
 from vnstock_news import Crawler
 
-# Cách 1: Dùng site_name (có sẵn config)
+# Cách 1: Dùng site_name (có sẵn config) -> Lưu ý: Đối với CafeF, config mặc định KHÔNG có RSS
 crawler = Crawler(site_name="cafef")
 
-# Cách 2: Custom config cho site mới
+# Cách 2: Custom config cho trang đã có hoặc site mới
 custom_config = {
     "name": "My Custom News",
     "domain": "mynews.com",
-    "rss": {
-        "urls": ["https://mynews.com/feed.xml"]
-    },
-    "sitemap_url": "https://mynews.com/sitemap.xml"
+    "rss_urls": ["https://mynews.com/feed.xml"],
+    "sitemap_url": "https://mynews.com/sitemap.xml",
+    "config": {
+        "title_selector": {"class": "title"},
+    }
 }
+# LƯU Ý QUAN TRỌNG: Để dùng custom config, bạn KHÔNG NÊN truyền site_name 
+# (hoặc phải truyền site_name="custom" và tự định nghĩa name, rss_urls, sitemap_url trong dict)
+# Nếu truyền cùng lúc Crawler(site_name="cafef", custom_config=...), thư viện sẽ ưu tiên site_name
 crawler = Crawler(custom_config=custom_config)
 ```
 
@@ -62,15 +66,18 @@ print(df.head())
 
 #### `get_articles(sitemap_url=None, limit=10, limit_per_feed=None)`
 
-Lấy tin từ RSS hoặc Sitemap (smart fallback).
+Lấy metadata của bài viết từ RSS hoặc URL thô từ Sitemap (smart fallback).
+
+> ⚠️ **Lưu Ý Quan Trọng về Sitemap:** 
+> Sitemap theo chuẩn XML chỉ chứa các thẻ `<loc>` (URL) và `<lastmod>` (thời gian cập nhật). Nếu `Crawler` fallback sang lấy tin từ Sitemap, kết quả trả về sẽ **KHÔNG có title, description, hay nội dung bài viết**, mà chỉ có `url` và `lastmod`. Để lấy nội dung chi tiết từ sitemap URL, hãy cân nhắc sử dụng `get_article_details(url)` hoặc chuyển sang dùng `BatchCrawler` / `AsyncBatchCrawler`.
 
 ```python
 import pandas as pd
 
-# Lấy 100 bài (dùng RSS trước, nếu không có thì dùng sitemap)
+# Lấy 100 bài (ưu tiên RSS trước, nếu web không có RSS sẽ fallback dùng sitemap)
 articles = crawler.get_articles(limit=100)  # Returns List[Dict]
 
-# Hoặc chỉ định sitemap URL
+# Hoặc chỉ định rõ sitemap URL
 articles = crawler.get_articles(
     sitemap_url="https://cafef.vn/latest-news-sitemap.xml",
     limit=200
@@ -78,14 +85,7 @@ articles = crawler.get_articles(
 
 print(f"Lấy được {len(articles)} bài")
 df = pd.DataFrame(articles)
-print(df[['title', 'publish_time']].head())
-```
-
-**Output:**
-```
-                    title      publish_time
-0  Chứng khoán tăng trưởng...  2025-01-15
-1  Nhà đầu tư nước ngoài...  2025-01-14
+print(df.head())
 ```
 
 **Parameters:**
@@ -131,33 +131,31 @@ crawler = BatchCrawler(
 
 ### Phương Thức
 
-#### `fetch_articles(limit=100, use_rss=True, use_sitemap=True, output_file=None)`
+#### `fetch_articles(sitemap_url=None, limit=10, top_n_per_feed=None, within=None)`
 
-Tải bài viết theo batch.
+Tải chi tiết hàng loạt bài viết dựa trên danh sách meta links gom được từ sitemap. Tự động tránh tải lại URL đã tồn tại trong file `temp`.
 
 ```python
-# Tải 100 bài mới nhất (dùng RSS trước)
+# Tải chi tiết 100 bài mới nhất dựa trên config sitemap mặc định của trang
 articles = crawler.fetch_articles(limit=100)
 
-# Tải 500 bài từ sitemap
+# Tải 500 bài dựa trên một sitemap URL cụ thể
 articles = crawler.fetch_articles(
     limit=500,
-    use_rss=False,
-    use_sitemap=True,
-    output_file="articles_batch.csv"
+    sitemap_url="https://cafef.vn/latest-news-sitemap.xml"
 )
 
-print(f"✅ Lấy được {len(articles)} bài")
+print(f"✅ Lấy được chi tiết {len(articles)} bài")
 print(articles.info())
 ```
 
 **Parameters:**
-- `limit` (int): Tối đa bao nhiêu bài
-- `use_rss` (bool): Dùng RSS trước hay không
-- `use_sitemap` (bool): Dùng sitemap hay không
-- `output_file` (str): Lưu vào file nào (nếu None thì dùng default)
+- `sitemap_url` (str or list, optional): Truyền tham số này nếu không muốn dùng config mặc định
+- `limit` (int): Tối đa lấy chi tiết bao nhiêu bài.
+- `top_n_per_feed` (int, optional): Số tin giới hạn nếu trang có nhiều RSS feed riêng lẻ.
+- `within` (str, optional): Bộ lọc biên độ thời gian (được dự định cho phiên bản tương lai).
 
-**Returns:** `pd.DataFrame`
+**Returns:** `pd.DataFrame` chứa chi tiết nội dung phân tích (parsed) của các website.
 
 ---
 
@@ -341,21 +339,21 @@ df = pd.DataFrame(articles)
 print(df[['title', 'publish_time']].head())
 ```
 
-### Ví Dụ 2: Lấy 500 Bài Lịch Sử Từ CafeF
+### Ví Dụ 2: Lấy Chi Tiết 500 Bài Kể Từ Hiện Tại Từ CafeF
 
 ```python
 from vnstock_news import BatchCrawler
 
 crawler = BatchCrawler(
     site_name="cafef",
-    request_delay=1.0
+    request_delay=1.0,
+    output_path="cafef_500_articles.csv"
 )
 
 articles = crawler.fetch_articles(limit=500)
-articles.to_csv("cafef_500_articles.csv", index=False)
 
-print(f"✅ Lấy {len(articles)} bài")
-print(f"Từ {articles['publish_time'].min()} đến {articles['publish_time'].max()}")
+print(f"✅ Đã tải và trích xuất chi tiết {len(articles)} bài")
+# print(f"Từ {articles['publish_time'].min()} đến {articles['publish_time'].max()}")
 ```
 
 ### Ví Dụ 3: Lấy Từ 3 Báo Cùng Lúc (Nhanh)
@@ -376,7 +374,7 @@ async def fetch_all_sites():
         )
         
         config = SITES_CONFIG[site_name]
-        sitemap_url = config.get('sitemap_url')
+        sitemap_url = config.get("sitemap_url") or config.get("sitemap", {}).get("current_url")
         
         print(f"⏳ Đang lấy từ {site_name}...")
         articles = await crawler.fetch_articles_async(

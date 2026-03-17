@@ -104,8 +104,11 @@ async def build_database():
         )
         
         try:
+            config = SITES_CONFIG[site_name]
+            sitemap_url = config.get("sitemap_url") or config.get("sitemap", {}).get("current_url")
+            
             articles = await crawler.fetch_articles_async(
-                sources=[site_name],
+                sources=[sitemap_url],
                 top_n=1000  # Lấy tối đa 1000 bài
             )
             
@@ -176,8 +179,12 @@ async def safe_fetch():
         max_concurrency=2    # Chỉ 2 requests cùng lúc
     )
     
+    from vnstock_news import SITES_CONFIG
+    config = SITES_CONFIG["cafef"]
+    sitemap_url = config.get("sitemap_url") or config.get("sitemap", {}).get("current_url")
+    
     articles = await crawler.fetch_articles_async(
-        sources=["cafef"],
+        sources=[sitemap_url],
         top_n=500
     )
     
@@ -608,8 +615,11 @@ class NewsAggregatorService:
                     max_concurrency=3
                 )
                 
+                config = __import__("vnstock_news").SITES_CONFIG[site_name]
+                sitemap_url = config.get("sitemap_url") or config.get("sitemap", {}).get("current_url")
+                
                 articles = await crawler.fetch_articles_async(
-                    sources=[site_name],
+                    sources=[sitemap_url],
                     top_n=100
                 )
                 

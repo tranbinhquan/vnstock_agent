@@ -375,7 +375,9 @@ async def fetch_all():
         if "rss" in config:
             sources = config["rss"]["urls"][:1]  # Lấy RSS đầu tiên
         else:
-            sources = [config.get("sitemap_url")]
+            # Hỗ trợ cả sitemap tĩnh (sitemap_url) và sitemap động (sitemap.current_url)
+            sitemap_url = config.get("sitemap_url") or config.get("sitemap", {}).get("current_url")
+            sources = [sitemap_url]
         
         print(f"📰 Đang lấy từ {site_name}...")
         articles = await crawler.fetch_articles_async(

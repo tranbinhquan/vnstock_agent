@@ -277,12 +277,10 @@ from vnstock_news import Crawler
 custom_config = {
     "name": "Báo XYZ",
     "domain": "baoxyz.vn",
-    "rss": {
-        "urls": [
-            "https://baoxyz.vn/feed.rss",
-            "https://baoxyz.vn/category/business/feed.rss"
-        ]
-    }
+    "rss_urls": [
+        "https://baoxyz.vn/feed.rss",
+        "https://baoxyz.vn/category/business/feed.rss"
+    ]
 }
 
 crawler = Crawler(custom_config=custom_config)
@@ -301,13 +299,11 @@ custom_config = {
     "domain": "baoxyz.vn",
     "sitemap_url": "https://baoxyz.vn/sitemap.xml",
     "config": {
-        "selectors": {
-            "title": "h1.title",              # CSS selector cho tiêu đề
-            "short_description": "p.summary", # CSS selector cho sapo
-            "content": "div.article-body",    # CSS selector cho nội dung
-            "publish_time": "span.date",      # CSS selector cho ngày
-            "author": "span.author"           # CSS selector cho tác giả
-        }
+        "title_selector": {"tag": "h1", "class": "title"},              # tag và class cho tiêu đề
+        "short_desc_selector": {"tag": "p", "class": "summary"},        # tag và class cho sapo
+        "content_selector": {"tag": "div", "class": "article-body"},    # tag và class cho nội dung
+        "publish_time_selector": {"tag": "span", "class": "date"},      # tag và class cho ngày
+        "author_selector": {"tag": "span", "class": "author"}           # tag và class cho tác giả
     }
 }
 
