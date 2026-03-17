@@ -118,7 +118,7 @@ Before running scripts or interacting with the sponsored ecosystem, activate the
 If the user asks you to "install the agent guide" or "setup the workspace", follow these precise steps to clone this repository into their **current project directory**:
 
 1. **Verify Project Directory & OS**: Ensure the user is in a specific project directory (NOT their home directory). **Crucially, identify the user's Operating System (macOS, Linux, or Windows) before executing any terminal commands**.
-2. **Check for Existing Files**: Check if any of these target files/folders already exist in the current directory: `AGENTS.md`, `docs/`, `.agent/`, `.github/`, `CLAUDE.md`, `.cursor/`.
+2. **Check for Existing Files**: Check if any of these target files/folders already exist in the current directory: `AGENTS.md`, `docs/`, `.agents/`, `.github/`, `CLAUDE.md`, `.cursor/`.
 3. **Prompt for Confirmation**: If any target files exist, **STOP**. Ask the user if they want to commit these files to Git (for safety) or directly delete them to make room for the new installation. **Do not destructively overwrite without permission.**
 4. **Clone Repository**: Once confirmed (or if the directory is clean), check if `git` is installed. Clone the repository to a temporary location:
    ```bash

@@ -45,7 +45,7 @@ description: Expert skill to assist users in migrating code within the Vnstock e
 > [!IMPORTANT]
 > **3. DO NOT BASH-SCRIPT TEXT REPLACEMENT**
 > Avoid using `sed` or `awk` for migrations. Use the provided Python script:
-> `python .agent/skills/vnstock-migration-expert/scripts/migrate_to_vnstock_data.py <path>`
+> `python .agents/skills/vnstock-migration-expert/scripts/migrate_to_vnstock_data.py <path>`
 
 ---
 
@@ -70,7 +70,7 @@ Follow these exact steps when requested to migrate code.
 ### Step 2: Automated Refactor
 - Execute the migration script in dry-run mode:
   ```bash
-  python .agent/skills/vnstock-migration-expert/scripts/migrate_to_vnstock_data.py --dry-run .
+  python .agents/skills/vnstock-migration-expert/scripts/migrate_to_vnstock_data.py --dry-run .
   ```
 - If the user approves, run without `--dry-run`.
 - **Expected Outcome**: All `import vnstock` are replaced with `import vnstock_data`.

@@ -39,7 +39,7 @@
 Kho lưu trữ này cung cấp file hướng dẫn chuyên biệt cho các nền tảng AI khác nhau:
 
 - **[.cursor/rules/instructions.md](.cursor/rules/instructions.md)** - Cho Cursor IDE
-- **[.agent/rules/GEMINI.md](.agent/rules/GEMINI.md)** - Cho Google Antigravity
+- **[.agents/rules/GEMINI.md](.agents/rules/GEMINI.md)** - Cho Google Antigravity
 - **[AGENTS.md](AGENTS.md)** - Cho Windsurf IDE
 - **[CLAUDE.md](CLAUDE.md)** - Cho Claude Code
 - **[GEMINI.md](GEMINI.md)** - Cho Google Gemini CLI
@@ -67,7 +67,7 @@ Move-Item -Path vnstock-agent-guide/docs, vnstock-agent-guide/.agents, vnstock-a
 
 | AI Agent               | File Instruction                  | Đặt tại thư mục gốc | Link Tải IDE                                                                                         |
 | ---------------------- | --------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------- |
-| **Google Antigravity** | `.agent/rules/GEMINI.md`          | ✅                  | [Tải tại đây](https://antigravity.google/)                                                           |
+| **Google Antigravity** | `.agents/rules/GEMINI.md`          | ✅                  | [Tải tại đây](https://antigravity.google/)                                                           |
 | **Cursor IDE**         | `.cursor/rules/instructions.md`   | ✅                  | [Tải tại đây](https://cursor.com/download)                                                           |
 | **Windsurf IDE**       | `AGENTS.md`                       | ✅                  | [Tải tại đây](https://windsurf.com/editor)                                                           |
 | **Claude Code**        | `CLAUDE.md`                       | ✅                  | [Tải tại đây](https://claude.com/product/claude-code)                                                |

@@ -3,7 +3,7 @@ website docs
 .github/copilot-instruction.md
 vnstock_data
 vnstock/
-# .agent/
+# .agents/
 .agents/skills/vnstock-document-generator/
 .agents/skills/power-agent-creator/
 /dev_notes/
