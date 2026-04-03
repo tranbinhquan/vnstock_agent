@@ -7,17 +7,26 @@
 1. **RSS Feed Aggregation** - Kết nối trực tiếp đến các luồng RSS của báo
 2. **Web Scraping via Sitemap** - Sử dụng sitemap (bản đồ chỉ mục web) để duyệt và lấy toàn bộ bài viết
 
+**Hầu hết các báo đều hỗ trợ cả RSS và Sitemap** vì đây là tiêu chuẩn web. vnstock_news cung cấp cấu hình sẵn nhưng bạn có thể tùy biến cho bất kỳ website nào có RSS/sitemap ví dụ để phân tích website đối thủ hoặc tối ưu SEO của chính mình.
+
 ### Đặc Điểm Chính
 
-- **📰 Hỗ trợ 12+ trang báo**: VnExpress, Tuổi Trẻ, CafeF, VietStock, Báo Đầu Tư, VnEconomy, PLO, v.v.
+- **📰 Hỗ trợ 21 trang báo**: VnExpress, Tuổi Trẻ, CafeF, Dân Trí, Thanh Niên, Znews, Tiền Phong, v.v.
 - **🌐 Hai phương thức lấy dữ liệu**: RSS (cập nhật mới nhất) + Sitemap (lịch sử toàn bộ)
 - **⚡ Hỗ trợ bất đồng bộ (async)**: Tải nhiều bài cùng lúc nhanh chóng
 - **💾 Caching thông minh**: Lưu cache để tránh tải lại cùng một bài
-- **🧹 Cleaning & Validation**: Tự động làm sạch, chuẩn hóa nội dung
+- **🧹 Cleaning & Validation**: Tự động làm sạch, chuẩn hóa nội dung loại bỏ link rác/media tự động.
 - **📊 Phân tích xu hướng**: Tìm ra chủ đề/keyword phổ biến từ tin tức
-- **🔄 Batch Processing**: Xử lý hàng loạt từ nhiều nguồn cùng lúc
+- **🔄 Trình Cào Hợp Nhất**: Xử lý tự động chuyển đổi thông minh giữa RSS và Sitemap nếu web lỗi.
 
-**Tất cả các báo đều hỗ trợ cả RSS và Sitemap** vì đây là tiêu chuẩn web. vnstock_news cung cấp cấu hình sẵn cho 12+ báo phổ biến nhưng có thể tùy biến để làm việc với bất kỳ website/báo nào có nguồn RSS/sitemap để cung cấp bản đồ cho thuật toán đọc bài viết chi tiết.
+### ✨ Điểm Mới Trong Phiên Bản 2.2.0 (Tháng 04/2026)
+
+- Nhận diện và trích xuất thông minh cấu trúc Tags.
+- Cấu hình linh hoạt sử dụng cơ chế **Fallback Selectors Array**: tự động thử nhiều bộ quy tắc CSS khác nhau để chống lại việc thay đổi layout giữa các chuyên mục.
+- Tích hợp động cơ **JS DataLayer Extraction**: có khả năng luồn sâu vào JSON Script để bóc tách siêu dữ liệu.
+- Crawler hợp nhất xử lý fallback RSS/Sitemap mượt mà, tự động bỏ qua các link phân trang, ảnh và video không phải bài viết.
+- Bộ giải mã thời gian chuẩn hoá mọi định dạng thời gian về ISO format (VD: "15 phút trước" -> YYYY-MM-DD HH:MM:SS), vá lỗi NaT gây lỗi parser ở các version cũ.
+- Cập nhật, phục hồi kết nối thành công 100% tỷ lệ cào, fix hoàn toàn tình trạng thiếu hụt siêu dữ liệu cho hàng loạt báo (Dân Trí, Tiền Phong, NLD, Thanh Niên, Znews, VietNamNet...) và bỏ qua lỗi SSL khi gặp trang cũ.
 
 ### Cấu Trúc Package
 
@@ -86,22 +95,29 @@ vnstock_news/
 
 ## Các Trang Báo Được Hỗ Trợ
 
-| Tên Báo                | Domain            | RSS | Sitemap | Ghi Chú                     |
-| ---------------------- | ----------------- | --- | ------- | --------------------------- |
-| **VnExpress**          | vnexpress.net     | ✅   | ✅       | RSS cập nhật nhanh          |
-| **Tuổi Trẻ**           | tuoitre.vn        | ✅   | ✅       | Sitemap tháng/năm           |
-| **CafeF**              | cafef.vn          | ✅   | ✅       | Cả hai                      |
-| **CafeBiz**            | cafebiz.vn        | ✅   | ✅       | Cả hai                      |
-| **VietStock**          | vietstock.vn      | ✅   | ✅       | Cả hai                      |
-| **VnEconomy**          | vneconomy.vn      | ✅   | ✅       | Sitemap XML                 |
-| **Báo Đầu Tư**         | baodautu.vn       | ✅   | ✅       | Sitemap XML                 |
-| **PLO**                | plo.vn            | ✅   | ✅       | Sitemap dynamic (tháng/năm) |
-| **Báo Mới**            | baomoi.com        | ✅   | ✅       | Sitemap XML                 |
-| **Thế Giới Tài Chính** | thesaigontimes.vn | ✅   | ✅       | Incremental sitemap         |
-| **Nhịp Cầu Đầu Tư**    | nhipcaudautu.vn   | ✅   | ✅       | Sitemap XML                 |
-| **Công Thương**        | congthuong.vn     | ✅   | ✅       | Sitemap XML                 |
-
-**Tất cả các báo đều hỗ trợ cả RSS và Sitemap** vì đây là tiêu chuẩn web. vnstock_news cung cấp cấu hình sẵn cho 12+ báo phổ biến nhưng có thể tùy biến để làm việc với bất kỳ website/báo nào có nguồn RSS/sitemap.
+| STT | Tên Báo                | Tên Config        | Loại Hình | RSS | Sitemap | Mô Tả/Ghi Chú                     |
+| --- | ---------------------- | ----------------- | --------- | --- | ------- | --------------------------------- |
+| 1   | **Nhân Dân**           | nhandan           | Cơ quan TW | ✅   | ✅       | Cơ quan trung ương của Đảng Cộng Sản Việt Nam |
+| 2   | **Tiền Phong**         | tienphong         | Cơ quan TW | ✅   | ✅       | Cơ quan trung ương của Đoàn TNCS Hồ Chí Minh |
+| 3   | **VietNamNet**         | vietnamnet        | Bộ Ngành  | ✅   | ✅       | Cơ quan chủ quản Bộ Dân Tộc và Tôn Giáo |
+| 4   | **Dân Trí**            | dantri            | Bộ Ngành  | ✅   | ✅       | Cơ quan của Bộ Nội vụ |
+| 5   | **VnExpress**          | vnexpress         | Bộ Ngành  | ✅   | ✅       | Thuộc Bộ Khoa học và Công nghệ |
+| 6   | **Báo Đầu Tư**         | baodautu          | Bộ Ngành  | ✅   | ✅       | Thuộc Bộ Tài chính |
+| 7   | **Thời Báo Tài Chính** | thoibaotaichinhvietnam | Bộ Ngành | ✅   | ✅       | Báo điện tử thuộc Bộ Tài Chính |
+| 8   | **Thanh Niên**         | thanhnien         | Tổ chức TW | ✅   | ✅       | Diễn đàn của Hội LHTN Việt Nam |
+| 9   | **Tuổi Trẻ**           | tuoitre           | Địa phương | ✅   | ✅       | Cơ quan báo của Thành Đoàn TP.HCM |
+| 10  | **Người Lao Động**     | nld               | Địa phương | ✅   | ✅       | Quản lý bởi Thành ủy TP.HCM |
+| 11  | **Pháp Luật TP.HCM**   | plo               | Địa phương | ✅   | ✅       | Cơ quan chủ quản: UBND TP.HCM |
+| 12  | **Kinh Tế Sài Gòn**    | ktsg              | Địa phương | ✅   | ✅       | Tạp chí Kinh tế Sài Gòn của UBND Tp. HCM |
+| 13  | **VnEconomy**          | vneconomy         | Chuyên ngành| ✅   | ✅       | Tạp chí của Hội Khoa học Kinh tế Việt Nam |
+| 14  | **Diễn Đàn Doanh Nghiệp**| dddn            | Chuyên ngành| ✅   | ✅       | Cơ quan của Liên đoàn Thương mại và Công nghiệp VN |
+| 15  | **PetroTimes**         | petrotimes        | Chuyên ngành| ✅   | ✅       | Tạp chí của Hội Dầu khí Việt Nam |
+| 16  | **Znews (Tri thức)**   | znews             | Chuyên ngành| ✅   | ✅       | Tạp chí điện tử của Hội Xuất bản Việt Nam |
+| 17  | **CafeF**              | cafef             | Trang tin | ✅   | ✅       | Trang thông tin điện tử của khối VCCorp |
+| 18  | **CafeBiz**            | cafebiz           | Trang tin | ✅   | ✅       | Trang thông tin điện tử của khối VCCorp |
+| 19  | **VietStock**          | vietstock         | Trang tin | ✅   | ✅       | Cổng thông tin Tài chính, Chứng khoán (CTCP Tài Việt) |
+| 20  | **24h**                | 24h               | Tổng hợp  | ✅   | ✅       | Trang tin điện tử tổng hợp 24h |
+| 21  | **Người Quan Sát**     | nguoiquansat      | Tổng hợp  | ✅   | ✅       | Trang TTĐTTH của báo Đầu tư đổi mới INTECH |
 
 ---
 
@@ -141,8 +157,6 @@ print(df.head())
 
 **Ưu điểm**: Lấy được lịch sử nhiều tháng/năm  
 **Nhược điểm**: Chậm hơn (phải duyệt từng bài)
-
-**Tất cả các báo đều hỗ trợ cả RSS và Sitemap**. Bạn có thể chọn phương thức phù hợp với nhu cầu: RSS cho tin mới nhất, Sitemap cho lịch sử.
 
 ### 3. **Batch Crawler** - Lấy Hàng Loạt (Đồng Bộ)
 
@@ -219,7 +233,10 @@ Các cột dữ liệu:
 | `publish_time`      | datetime | Thời gian đăng        |
 | `author`            | string   | Tác giả               |
 | `category`          | string   | Chuyên mục            |
+| `tags`              | string   | Từ khóa/Tags (nếu có) |
+| `view_counts`       | integer  | Lượt xem (nếu có)     |
 | `image_url`         | string   | URL hình ảnh (nếu có) |
+| `source`            | string   | Tên config của báo    |
 
 ### Ví dụ Output:
 
@@ -233,9 +250,9 @@ print(df.head())
 ```
 
 ```
-              url                   title  short_description  publish_time
-0  https://cafef.vn/...  Thị trường chứng...  Dự báo tăng từ...  2025-01-15
-1  https://cafef.vn/...  VN-Index chiếm...  Nhà đầu tư lo...  2025-01-14
+              url                   title  short_description  publish_time        source
+0  https://cafef.vn/...  Thị trường chứng...  Dự báo tăng từ...  2025-01-15 10:30    cafef
+1  https://cafef.vn/...  VN-Index chiếm...  Nhà đầu tư lo...  2025-01-14 09:15    cafef
 ```
 
 ---
@@ -290,7 +307,7 @@ from vnstock_news.config.sites import SITES_CONFIG
 2. **Rate Limiting & Block IP**
    - Tránh gửi quá nhiều request (mỗi báo có giới hạn)
    - Thêm delay giữa các request: `request_delay=2.0`
-   - Lưu ý việc lạm dụng có thể bị chặn IP
+   - Lưu ý việc lạm dụng có thể bị chặn IP hoặc rủi ro pháp lý
 
 3. **Terms of Service**
    - Đọc kỹ ToS của trang báo trước khi lấy dữ liệu
@@ -299,9 +316,6 @@ from vnstock_news.config.sites import SITES_CONFIG
 4. **Robot.txt & Sitemap.xml**
    - Hãy kiểm tra `/robots.txt` của báo
    - Sitemap thường được phép truy cập
-
-
-**Hầu hết các báo đều hỗ trợ cả RSS và Sitemap** vì đây là tiêu chuẩn web. vnstock_news cung cấp cấu hình sẵn nhưng bạn có thể tùy biến cho bất kỳ website nào có RSS/sitemap.
 
 ---
 
@@ -318,83 +332,18 @@ from vnstock_news.config.sites import SITES_CONFIG
 
 ## Quickstart - Bắt Đầu Nhanh
 
-### Thu Thập Tin Từ RSS (Cách Nhanh Nhất)
+Để nhanh chóng áp dụng vào ứng dụng thực tế, chúng tôi chia rẽ ròi **5 Use Case - Templates hoàn chỉnh** (code Python chạy ngay được) tại thư mục con `scripts/`. Hãy chọn template đúng với Use Case mà hệ thống của bạn cần:
 
-```python
-import pandas as pd
-from vnstock_news import Crawler
+1. **[`scripts/01_realtime_rss_tracking.py`](scripts/01_realtime_rss_tracking.py)**: Dùng cho Tracking Live/Bot Alerts chứng khoán. Chỉ lấy tin tức tức thời nhạy bén nhất trong ngày qua RSS.
+2. **[`scripts/02_historical_sitemap_ml.py`](scripts/02_historical_sitemap_ml.py)**: Dùng cho ML/NLP. Cào dữ liệu lịch sử số lượng cực lớn trong quá khứ thông qua Sitemap.
+3. **[`scripts/03_combined_rss_sitemap.py`](scripts/03_combined_rss_sitemap.py)**: Bài toán thực tế kết hợp cả 2 nguồn: Lấy RSS tức thời và quét Sitemap bù đắp các tin bị trôi mất.
+4. **[`scripts/04_custom_site_parsing.py`](scripts/04_custom_site_parsing.py)**: Hướng dẫn nâng cao Custom XPath/CSS cho báo bất kỳ chưa có trong thư viện.
+5. **[`scripts/05_batch_multiple_sites.py`](scripts/05_batch_multiple_sites.py)**: Chạy Data Pipeline: Thu thập siêu tốc từ hàng loạt nhiều tờ báo cùng lúc qua `AsyncBatchCrawler`.
 
-# 1. Tạo crawler cho VnExpress
-crawler = Crawler(site_name="vnexpress")
-
-# 2. Lấy 10 bài mới nhất từ RSS
-articles = crawler.get_articles_from_feed(limit_per_feed=10)
-
-# 3. Lưu vào CSV
-df = pd.DataFrame(articles)
-df.to_csv("vnexpress_news.csv", index=False, encoding='utf-8-sig')
-
-print(f"✅ Đã lấy {len(articles)} bài viết")
-```
-
-### Thu Thập Tin Từ Sitemap (Lấy Lịch Sử)
-
-```python
-from vnstock_news import BatchCrawler
-
-# 1. Tạo batch crawler
-crawler = BatchCrawler(
-    site_name="cafef",
-    request_delay=1.5  # Delay 1.5 giây giữa mỗi request
-)
-
-# 2. Lấy 100 bài từ sitemap
-articles = crawler.fetch_articles(limit=100)
-
-# 3. Lưu vào CSV
-articles.to_csv("cafef_articles.csv", index=False)
-
-print(f"✅ Đã lấy {len(articles)} bài viết từ {articles['publish_time'].min()} đến {articles['publish_time'].max()}")
-```
-
-### Lấy Từ Nhiều Báo Cùng Lúc (Nhanh)
-
-```python
-import asyncio
-from vnstock_news import AsyncBatchCrawler, SITES_CONFIG
-
-async def fetch_all():
-    sites = ["cafef", "tuoitre", "vietstock"]
-    all_articles = []
-    
-    for site_name in sites:
-        crawler = AsyncBatchCrawler(site_name=site_name)
-        config = SITES_CONFIG[site_name]
-        
-        # Lấy source (RSS hoặc Sitemap)
-        if "rss" in config:
-            sources = config["rss"]["urls"][:1]  # Lấy RSS đầu tiên
-        else:
-            # Hỗ trợ cả sitemap tĩnh (sitemap_url) và sitemap động (sitemap.current_url)
-            sitemap_url = config.get("sitemap_url") or config.get("sitemap", {}).get("current_url")
-            sources = [sitemap_url]
-        
-        print(f"📰 Đang lấy từ {site_name}...")
-        articles = await crawler.fetch_articles_async(
-            sources=sources,
-            top_n=50
-        )
-        
-        articles['source'] = site_name
-        all_articles.append(articles)
-    
-    # Gộp tất cả
-    result = pd.concat(all_articles, ignore_index=True)
-    return result
-
-# Chạy
-articles = asyncio.run(fetch_all())
-print(f"✅ Tổng cộng lấy được {len(articles)} bài")
+👉 **Cách dùng:**
+Từ terminal trong thư mục của bạn, chạy file với trình thông dịch đã cài vnstock_news:
+```bash
+python docs/vnstock_news/scripts/01_realtime_rss_tracking.py
 ```
 
 ---
@@ -437,7 +386,6 @@ print(f"✅ Tổng cộng lấy được {len(articles)} bài")
 ## Tài Liệu Tham Khảo
 
 - **Vnstock Official**: https://vnstocks.com/
-- **GitHub**: https://github.com/vnstock-lab
 - **Robots.txt Guide**: https://www.robotstxt.org/
 - **Sitemap Protocol**: https://www.sitemaps.org/
 - **RSS Standard**: https://www.rssboard.org/

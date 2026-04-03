@@ -52,15 +52,15 @@ print(df.head())
 
 **Output:**
 ```
-                              url                    title  publish_time
-0  https://cafef.vn/investment/...  Thị trường chứng khoán...  2025-01-15
-1  https://cafef.vn/investment/...  Nhà đầu tư tiếp tục...  2025-01-15
+                              url                    title  publish_time              source
+0  https://cafef.vn/article-1.chn  Chứng khoán tăng mạnh...    2025-01-20 10:30        cafef
+1  https://cafef.vn/article-2.chn  NHNN hạ lãi suất...         2025-01-19 09:15        cafef
 ```
 
 **Parameters:**
 - `limit_per_feed` (int): Lấy tối đa bao nhiêu bài từ mỗi RSS feed
 
-**Returns:** `List[Dict[str, Any]]` với các key `[url, title, short_description, publish_time, author]`
+**Returns:** `List[Dict[str, Any]]` với các cấu trúc chuẩn hoá `[url, title, short_description, content, publish_time, author, category, tags, view_counts, image_url, source]`
 
 ---
 
@@ -323,76 +323,23 @@ articles = asyncio.run(main())
 
 ---
 
-## Ví Dụ Thực Tế
+## Ví Dụ Thực Tế & Templates Chạy Ngay
 
-### Ví Dụ 1: Lấy Nhanh 20 Bài Mới Từ VnExpress
+Chúng tôi đã chuyển các đoạn code minh hoạ này thành tập hợp các **Scripts Templates** thực tế chia theo Use Case chuyên biệt.
 
-```python
-from vnstock_news import Crawler
-import pandas as pd
+✅ **Ví Dụ 1 (Dành cho Tracking tức thời):** Lấy siêu tốc nội dung mới nhất qua RSS.
+👉 Xem và chạy: [`scripts/01_realtime_rss_tracking.py`](scripts/01_realtime_rss_tracking.py)
 
-crawler = Crawler(site_name="vnexpress")
-articles = crawler.get_articles_from_feed(limit_per_feed=20)  # List[Dict]
+✅ **Ví Dụ 2 (Dành cho NLP/ML Data):** Tải lịch sử chuyên sâu bằng Sitemap.
+👉 Xem và chạy: [`scripts/02_historical_sitemap_ml.py`](scripts/02_historical_sitemap_ml.py)
 
-print(f"✅ Lấy {len(articles)} bài")
-df = pd.DataFrame(articles)
-print(df[['title', 'publish_time']].head())
-```
+✅ **Ví Dụ 3 (Data Pipeline Cao Cấp):** Kết hợp cả 2 nguồn, hoặc mở rộng thu thập chéo 5-10 tờ báo cùng một lúc.
+👉 Lấy RSS bù đắp Sitemap: [`scripts/03_combined_rss_sitemap.py`](scripts/03_combined_rss_sitemap.py)
+👉 Crawl song song nhiều trang: [`scripts/05_batch_multiple_sites.py`](scripts/05_batch_multiple_sites.py)
 
-### Ví Dụ 2: Lấy Chi Tiết 500 Bài Kể Từ Hiện Tại Từ CafeF
+✅ **Ví Dụ 4 (Tự Khai Phá Website Lạ):** Áp dụng Custom XPath trên bất kỳ website báo nào.
+👉 Xem và chạy: [`scripts/04_custom_site_parsing.py`](scripts/04_custom_site_parsing.py)
 
-```python
-from vnstock_news import BatchCrawler
-
-crawler = BatchCrawler(
-    site_name="cafef",
-    request_delay=1.0,
-    output_path="cafef_500_articles.csv"
-)
-
-articles = crawler.fetch_articles(limit=500)
-
-print(f"✅ Đã tải và trích xuất chi tiết {len(articles)} bài")
-# print(f"Từ {articles['publish_time'].min()} đến {articles['publish_time'].max()}")
-```
-
-### Ví Dụ 3: Lấy Từ 3 Báo Cùng Lúc (Nhanh)
-
-```python
-import asyncio
-from vnstock_news import AsyncBatchCrawler, SITES_CONFIG
-import pandas as pd
-
-async def fetch_all_sites():
-    sites = ["cafef", "tuoitre", "vietstock"]
-    all_articles = []
-    
-    for site_name in sites:
-        crawler = AsyncBatchCrawler(
-            site_name=site_name,
-            max_concurrency=5
-        )
-        
-        config = SITES_CONFIG[site_name]
-        sitemap_url = config.get("sitemap_url") or config.get("sitemap", {}).get("current_url")
-        
-        print(f"⏳ Đang lấy từ {site_name}...")
-        articles = await crawler.fetch_articles_async(
-            sources=[sitemap_url],
-            top_n=100  # Lấy 100 bài
-        )
-        articles['source'] = site_name
-        all_articles.append(articles)
-    
-    result = pd.concat(all_articles, ignore_index=True)
-    return result
-
-articles = asyncio.run(fetch_all_sites())
-articles.to_csv("all_sites_articles.csv", index=False)
-
-print(f"✅ Tổng {len(articles)} bài từ {articles['source'].nunique()} báo")
-print(articles['source'].value_counts())
-```
 
 ---
 
