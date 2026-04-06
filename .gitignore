@@ -2,7 +2,7 @@ private_packages
 website docs
 .github/copilot-instruction.md
 vnstock_data
-vnstock/
+/vnstock/
 # .agents/
 .agents/skills/vnstock-document-generator/
 .agents/skills/power-agent-creator/

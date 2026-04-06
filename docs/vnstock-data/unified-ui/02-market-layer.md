@@ -32,6 +32,7 @@ Market()
 | Method | Mô Tả | Return |
 |--------|------|--------|
 | `ohlcv()` | Giá OHLCV lịch sử | DataFrame |
+| `trade_history()` | Lịch sử thống kê giao dịch (giá, khối lượng, giá trị) | DataFrame |
 | `trades()` | Lệnh giao dịch chi tiết (Time & Sales) | DataFrame |
 | `order_book()` | Cấp độ mua/bán | DataFrame |
 | `quote()` | Giá hiện tại / Bảng giá | DataFrame |
@@ -58,6 +59,13 @@ df_ohlc = mkt.equity("VIC").ohlcv(
 print(df_ohlc)
 # Columns: ['time', 'open', 'high', 'low', 'close', 'volume']
 
+# ===== Lịch sử Thống kê Giao dịch =====
+history_stats = mkt.equity("VIC").trade_history(
+    start="2026-02-01",
+    end="2026-03-01"
+)
+print(history_stats)
+
 # ===== Intraday Trades (Chi tiết lệnh) =====
 df_trades = mkt.equity("TCB").trades()
 print(df_trades)
@@ -70,6 +78,14 @@ print(df_orderbook)
 quote = mkt.equity("HPG").quote()
 print(quote)
 
+# ===== Thống kê Phiên (session_stats) =====
+session = mkt.equity("VIC").session_stats()
+print(session)
+
+# ===== Tổng hợp Cổ phiếu (summary) =====
+summary_info = mkt.equity("VIC").summary()
+print(summary_info)
+
 # ===== Dòng tiền Nước ngoài =====
 foreign = mkt.equity("VIC").foreign_flow()
 print(foreign)
@@ -81,6 +97,10 @@ print(proprietary)
 # ===== Giao dịch Thỏa thuận =====
 blocks = mkt.equity("VIC").block_trades()
 print(blocks)
+
+# ===== Giao dịch Lô lẻ =====
+odds = mkt.equity("VIC").odd_lot()
+print(odds)
 
 # ===== Volume Profile =====
 vol_profile = mkt.equity("VJC").volume_profile()
@@ -120,6 +140,10 @@ print(df_vnindex)
 # Điểm hiện tại
 quote_index = mkt.index("VNINDEX").quote()
 print(quote_index)
+
+# Tổng hợp chỉ số
+summary_index = mkt.index("VNINDEX").summary()
+print(summary_index)
 ```
 
 ---
@@ -156,6 +180,15 @@ print(df_vn30f)
 # Giá hiện tại
 quote_vn30f = mkt.futures("VN30F2503").quote()
 print(quote_vn30f)
+
+# Lệnh giao dịch chi tiết
+trades_vn30f = mkt.futures("VN30F2503").trades()
+
+# Cấp độ mua/bán
+orderbook_vn30f = mkt.futures("VN30F2503").order_book()
+
+# Tổng hợp hợp đồng
+summary_vn30f = mkt.futures("VN30F2503").summary()
 ```
 
 ---
@@ -190,8 +223,17 @@ df_warrant = mkt.warrant("CACB2511").ohlcv(
 print(df_warrant)
 
 # Giá hiện tại warrant
-quote = mkt.warrant("CACB2511").quote()
-print(quote)
+quote_warrant = mkt.warrant("CACB2511").quote()
+print(quote_warrant)
+
+# Lệnh giao dịch chi tiết
+trades_warrant = mkt.warrant("CACB2511").trades()
+
+# Cấp độ mua/bán
+orderbook_warrant = mkt.warrant("CACB2511").order_book()
+
+# Tổng hợp chứng quyền
+summary_warrant = mkt.warrant("CACB2511").summary()
 ```
 
 ---

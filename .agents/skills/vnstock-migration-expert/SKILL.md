@@ -12,7 +12,7 @@ description: Expert skill to assist users in migrating code within the Vnstock e
 | User Intent | Best Tool / Script | Action |
 | :--- | :--- | :--- |
 | "Add API Key but still community version?" | Guide `docs/vnstock/12-migration-guide.md` | Explain `vnstock` vs `vnstock_data`. Instruct to install and switch imports. |
-| "Migrate large project Free to Sponsor" | `scripts/migrate_to_vnstock_data.py` | Ensure code is committed, then run automated Find & Replace script. |
+| "Migrate large project Free to Sponsor" | `vnstock.core.utils.upgrade.migrate_to_sponsor` | Ensure code is committed, then run the built-in AST migration Python function. |
 | "GUI Installation Failed" | `docs/setup-and-debug/02-installation-troubleshooting.md` | Instruct to install from `requirements.txt` first. |
 | "externally-managed-environment error" | `docs/setup-and-debug/02-installation-troubleshooting.md` | Instruct to create a Virtual Environment (`.venv`). |
 | "Migrate old code to Unified UI (v3)" | `docs/vnstock-data/14-unified-ui.md` | Analyze code and map to the 7 Layers (Reference, Market, Fundamental, etc.). |
@@ -44,8 +44,8 @@ description: Expert skill to assist users in migrating code within the Vnstock e
 
 > [!IMPORTANT]
 > **3. DO NOT BASH-SCRIPT TEXT REPLACEMENT**
-> Avoid using `sed` or `awk` for migrations. Use the provided Python script:
-> `python .agents/skills/vnstock-migration-expert/scripts/migrate_to_vnstock_data.py <path>`
+> Avoid using `sed` or `awk` for migrations. Starting from vnstock v3.5.1, use the AST migration function shipped with the library using a Python snippet tool:
+> `from vnstock.core.utils.upgrade import migrate_to_sponsor; migrate_to_sponsor(".")`
 
 ---
 
@@ -68,12 +68,12 @@ Follow these exact steps when requested to migrate code.
 - **Exit Condition**: Ask the user: "Is your code committed to Git or backed up?" Proceed only on confirmation.
 
 ### Step 2: Automated Refactor
-- Execute the migration script in dry-run mode:
-  ```bash
-  python .agents/skills/vnstock-migration-expert/scripts/migrate_to_vnstock_data.py --dry-run .
+- Use a Python Tool/Snippet to run the built-in AST migration utility provided in `vnstock` v3.5.1+:
+  ```python
+  from vnstock.core.utils.upgrade import migrate_to_sponsor
+  migrate_to_sponsor(target_dir=".")
   ```
-- If the user approves, run without `--dry-run`.
-- **Expected Outcome**: All `import vnstock` are replaced with `import vnstock_data`.
+- **Expected Outcome**: All `import vnstock` blocks are semantically replaced with `vnstock_data`, bypassing regular expression limitations. Do not edit `.py` files manually if the codebase is large.
 
 ### Step 3: Unified UI Adjustments (Optional)
 *(Only if migrating to v3.0.0+ Unified UI)*
@@ -92,20 +92,18 @@ Follow these exact steps when requested to migrate code.
 
 ### Example 1: Free to Sponsor Upgrade
 
-**User**: "I bought the Gold package and added the API key but it still says Community!"
+**User**: "I bought the Gold package and added the API key but it still says Community!" or the user provides a terminal output with warning: *"Đã tìm thấy thư viện Sponsor..."*
 
 **Agent Thinking:**
-- *Trigger*: "still says Community" with API key.
-- *Action*: Explain `vnstock` vs `vnstock_data` and perform Find & Replace.
+- *Trigger*: "still says Community" with API key, or Smart AST Check detects user has `vnstock_data` installed but is running free version scripts.
+- *Action*: Explain `vnstock` vs `vnstock_data` and auto-run the built-in migration function.
 
 **Agent Action:**
-1. Reply: "The API key is correct! You simply need to change the library name from `vnstock` to `vnstock_data` in your imports."
-2. Propose to change `main.py`:
+1. Reply: "The API key alone does not unlock limits in the free version. You need to change the library name from `vnstock` to `vnstock_data` in your imports."
+2. Propose running the AST migration auto-script by executing:
    ```python
-   # Old
-   from vnstock import Listing
-   # New
-   from vnstock_data import Listing
+   from vnstock.core.utils.upgrade import migrate_to_sponsor
+   migrate_to_sponsor(target_dir=".")
    ```
 
 ### Example 2: Legacy to Unified UI Migration
