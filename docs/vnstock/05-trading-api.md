@@ -65,14 +65,14 @@ trading = Trading(source="KBS", symbol="VCI")
 
 # Lấy bảng giá (standard columns)
 board = trading.price_board(symbols_list=['VCI', 'VCB', 'ACB'])
-print(f"Shape: {board.shape}")  # (3, 28)
+print(f"Shape: {board.shape}")  # (3, 29)
 print(f"Columns: {list(board.columns)}")
 print(f"Dtypes:\n{board.dtypes}")
 # Output:
-# Shape: (3, 28)
+# Shape: (3, 29)
 # Columns: ['symbol', 'exchange', 'ceiling_price', 'floor_price', 'reference_price',
 #           'open_price', 'high_price', 'low_price', 'close_price', 'average_price',
-#           'total_trades', 'total_value', 'price_change', 'percent_change',
+#           'volume_accumulated', 'volume_last', 'total_value', 'price_change', 'percent_change',
 #           'bid_price_1', 'bid_vol_1', 'bid_price_2', 'bid_vol_2', 'bid_price_3', 'bid_vol_3',
 #           'ask_price_1', 'ask_vol_1', 'ask_price_2', 'ask_vol_2', 'ask_price_3', 'ask_vol_3',
 #           'foreign_buy_volume', 'foreign_sell_volume']
@@ -135,7 +135,7 @@ print(board[['symbol', 'ref_price', 'match_price', 'total_volume']])
 
 | Feature | KBS | VCI | Ưu Điểm |
 |---------|-----|-----|---------|
-| **Columns** | 28 | 77 | VCI cực kỳ chi tiết |
+| **Columns** | 29 | 77 | VCI cực kỳ chi tiết |
 | **Structure** | Flat columns | Flat columns | Cả hai đều dễ xử lý |
 | **Price Data** | OHLC, change | Full market depth | VCI đầy đủ hơn |
 | **Bid/Ask** | 3 levels | 3 levels | Cả hai đều có |
@@ -165,7 +165,7 @@ print(board[['symbol', 'ref_price', 'match_price', 'total_volume']])
 trading_kbs = Trading(source="KBS", symbol="VCI")
 trading_vci = Trading(source="VCI", symbol="VCI")
 
-# KBS - 28 columns
+# KBS - 29 columns
 board_kbs = trading_kbs.price_board(symbols_list=['VCI', 'VCB'])
 print(board_kbs[['symbol', 'reference_price', 'price_change']])
 
@@ -191,9 +191,9 @@ print("Cổ phiếu tăng giá:")
 print(risers[['symbol', 'reference_price', 'price_change', 'percent_change']])
 
 # Lọc theo khối lượng giao dịch
-high_volume = board[board['total_trades'] > 1000]
+high_volume = board[board['volume_accumulated'] > 1000]
 print("\nCổ phiếu giao dịch sôi động:")
-print(high_volume[['symbol', 'total_trades', 'total_value']])
+print(high_volume[['symbol', 'volume_accumulated', 'total_value']])
 
 # Tính toán thống kê
 avg_change = board['percent_change'].mean()
@@ -256,7 +256,7 @@ df = pd.read_csv('price_board.csv')
 # Phân tích theo sàn
 exchange_stats = df.groupby('exchange').agg({
     'total_value': 'sum',
-    'total_trades': 'sum',
+    'volume_accumulated': 'sum',
     'symbol': 'count'
 }).rename(columns={'symbol': 'stock_count'})
 print("Thống kê theo sàn:")

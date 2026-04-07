@@ -371,6 +371,18 @@ mkt = Market()
 futures_price = mkt.futures("VN30F2503").ohlcv(start="2026-02-01", end="2026-03-01")
 ```
 
+### 6️⃣ Compatibility Aliases (Tính tương thích ngược)
+
+Unified UI hỗ trợ đầy đủ các hàm cũ từ `Trading` và `Quote` bằng các hàm *alias* để đảm bảo cấu trúc mới dễ chuyển tiếp mà không làm gián đoạn code:
+
+- `history()` chuyển tiếp tới `ohlcv()` - Đặc biệt là bản chuyển đổi từ hàm `price_history` trước kia trong lớp `Trading` (như `mkt.equity("VIC").history(...)`).
+- `intraday()` chuyển tiếp tới `trades()`
+- `price_depth()` chuyển tiếp tới `order_book()`
+- `price_board()` chuyển tiếp tới `quote()`
+- `trading_stats()` chuyển tiếp tới `session_stats()`
+- `put_through()` chuyển tiếp tới `block_trades()`
+- `matched_by_price()` chuyển tiếp tới `volume_profile()`
+
 ---
 
 ## 🧪 Tính Năng Thử Nghiệm

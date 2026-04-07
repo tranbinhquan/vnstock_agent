@@ -61,49 +61,40 @@ df_gdp_q = mac.economy().gdp(
     end="2026-03",
     period="quarter"
 )
-print(df_gdp_q[['report_time', 'gdp_growth']])
-#      report_time  gdp_growth
-# 0    2020Q1       3.5%
-# 1    2020Q2       0.4%
-# 2    2020Q3       2.4%
+df_gdp_q
 
 # GDP năm
 df_gdp_y = mac.economy().gdp(period="year")
-print(df_gdp_y[['report_time', 'gdp_growth']].tail(3))
+df_gdp_y
 
 # ===== CPI (Chỉ Số Giá) =====
 # CPI theo tháng
 df_cpi = mac.economy().cpi(period="month", length=24)  # 24 tháng gần nhất
-print(df_cpi[['report_time', 'cpi_yoy', 'cpi_mom']])
-#      report_time  cpi_yoy  cpi_mom
-# 0    2024-03     2.50%    0.30%
-# 1    2024-04     3.65%    0.45%
+df_cpi
 
 # ===== Industrial Production (Sản Xuất Công Nghiệp) =====
 df_ind = mac.economy().industry_prod(period="month", length=12)
-print(df_ind[['report_time', 'production_growth']])
+df_ind
 
 # ===== Import-Export (Xuất Nhập Khẩu) =====
 df_trade = mac.economy().import_export(period="month")
-print(df_trade[['report_time', 'export', 'import', 'trade_balance']])
-#      report_time    export    import  trade_balance
-# 0    2026-02      3500.5    3200.3        +300.2
+df_trade
 
 # ===== Retail Sales (Bán Lẻ) =====
 df_retail = mac.economy().retail(period="month")
-print(df_retail[['report_time', 'retail_sales']])
+df_retail
 
 # ===== FDI (Đầu Tư Trực Tiếp) =====
 df_fdi = mac.economy().fdi(period="month")
-print(df_fdi[['report_time', 'fdi_registered', 'fdi_implemented']])
+df_fdi
 
 # ===== Money Supply (Cung Tiền) =====
 df_money = mac.economy().money_supply(period="month")
-print(df_money[['report_time', 'm0', 'm1', 'm2']])
+df_money
 
 # ===== Population & Labor (Dân Số & Lao Động) =====
 df_labor = mac.economy().population_labor(period="year")
-print(df_labor[['report_time', 'population', 'unemployment_rate']])
+df_labor
 ```
 
 ---

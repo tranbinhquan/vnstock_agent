@@ -13,16 +13,13 @@ from vnstock_data import Macro
 macro = Macro()
 
 # Khởi tạo với random user agent
-macro = Macro(random_agent=True)
+macro = Macro()
 
 # Hiển thị debug logs
-macro = Macro(show_log=True)
+macro = Macro()
 ```
 
 ### Tham Số Khởi Tạo
-
-- `random_agent` (bool, default=False): Sử dụng random user agent để tránh bị block
-- `show_log` (bool, default=False): Bật log debug
 
 **Đặc tả mới từ bản cập nhật**:
 - Các hàm truy xuất dữ liệu nay cung cấp tùy chọn tham số `length` (Khoảng thời gian tương đối như `'1Y'`, `'3M'`, `'30D'`, `'100b'`) làm mặc định thay vì bắt buộc truyền `start` và `end`.

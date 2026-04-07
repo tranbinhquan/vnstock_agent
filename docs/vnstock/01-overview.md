@@ -1,8 +1,8 @@
-# Vnstock 3.4.0 - Tổng Quan Kiến Trúc & Dữ Liệu
+# Vnstock 3.5.1 - Tổng Quan Kiến Trúc & Dữ Liệu
 
-**Phiên bản:** 3.4.0+  
+**Phiên bản:** 3.5.1+  
 
-**Cập nhật:** Tháng 1, 2026  
+**Cập nhật:** 6 Tháng 4, 2026  
 
 **Trạng thái:** Hoạt động
 
@@ -147,6 +147,13 @@ try:
 except RateLimitExceeded as e:
     print(e)  # Sẽ hiển thị hướng dẫn nâng cấp phù hợp
 ```
+
+#### Nâng Cấp sang vnstock_data (Phiên bản Sponsor)
+
+Bắt đầu từ bản v3.5.1, nếu bạn đã cài đặt gói thư viện Sponsor `vnstock_data`, mã nguồn thư viện miễn phí `vnstock` sẽ tự động phát hiện bằng hàm `_check_sponsor_package` để cảnh báo bạn nâng cấp.
+
+Để nâng cấp dự án sang sử dụng đầy đủ các tính năng trong bản `vnstock_data` (sponsor) và giới hạn API được mở rộng, bạn có thể thực hiện di chuyển mã thủ công hoặc qua công cụ tự động của thư viện. Xem hướng dẫn di chuyển mã chi tiết tại [Hướng Dẫn Nâng Cấp (Migration Guide)](12-migration-guide.md). Các công cụ hỗ trợ như **AI Agents** có thể tự động chạy kịch bản `migrate_to_sponsor(target_dir=".")` để thay bạn hoàn tất việc kết nối phiên bản mới một cách tự động.
+
 
 ---
 
@@ -499,11 +506,12 @@ usd_vnd = fx.get_rate("USD", "VND")
 
 Vnstock cung cấp các utilities hỗ trợ:
 
-### Market Utilities (`core/utils/market.py`)
+### Market Utilities (`core/utils/market.py`, `core/utils/market_events.py`)
 
 - `trading_hours()` - Lấy giờ giao dịch
 - `is_trading_hour()` - Kiểm tra giờ giao dịch
 - `market_status()` - Trạng thái thị trường (preparing, real_time, settling, historical_only)
+- `add_market_events(custom_events: dict)` - Bổ sung các sự kiện thị trường linh hoạt, hỗ trợ người dùng tự bổ sung thông tin nghỉ lễ, sự cố thị trường...
 
 ### Interval Utilities (`core/utils/interval.py`)
 
@@ -783,13 +791,14 @@ quote = Quote(source="vci", symbol="VCB")
 4. **[05-Financial API](05-financial-api.md)** - Dữ liệu tài chính
 5. **[06-Company API](06-company-api.md)** - Thông tin công ty
 6. **[07-Trading API](07-trading-api.md)** - Dữ liệu giao dịch
-7. **[08-Best Practices](08-best-practices.md)** - Mẹo & kinh nghiệm
+7. **[11-Best Practices](11-best-practices.md)** - Mẹo & kinh nghiệm
+8. **[12-Migration Guide](12-migration-guide.md)** - Hướng dẫn nâng cấp thư viện
 
 ---
 
-**Last Updated**: Tháng 1, 2026  
+**Last Updated**: Tháng 4, 2026  
 
-**Version**: 3.4.0  
+**Version**: 3.5.1  
 
 **Status**: Hoạt động  
 
