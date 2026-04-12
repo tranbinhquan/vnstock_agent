@@ -14,9 +14,9 @@ Market()
 ├── .warrant(symbol)       # Thị trường chứng quyền
 ├── .etf(symbol)           # Thị trường ETF
 ├── .fund(symbol)          # Thị trường quỹ đầu tư mở
-├── .crypto(symbol)        # 🧪 Tiền mã hoá (experimental)
-├── .forex(symbol)         # 🧪 Ngoại hối (experimental)
-├── .commodity(symbol)     # 🧪 Hàng hoá quốc tế (experimental)
+├── .crypto(symbol)        # Tiền mã hoá
+├── .forex(symbol)         # Ngoại hối
+├── .commodity(symbol)     # Hàng hoá quốc tế
 └── .quote(symbols_list)   # Bảng giá nhiều mã
 ```
 
@@ -328,35 +328,84 @@ print(df_quotes)
 
 ---
 
-### 8. 🧪 Thị Trường Quốc Tế (Experimental)
+### 8. Thị Trường Quốc Tế (International Market)
 
-> **Lưu ý**: Các domain sau đang trong giai đoạn thử nghiệm và có thể chưa ổn định. Chỉ hỗ trợ method `ohlcv()` cho dữ liệu lịch sử thông qua nguồn MSN.
+#### Crypto Market (Thị Trường Tiền Mã Hóa)
 
-#### Crypto Market
+**Nguồn chính:** Binance (Spot Trading API)  
+**Registry Key:** `"market.crypto"`
 
+Dữ liệu Crypto Market được liên kết trực tiếp từ **Binance Spot API**. Hỗ trợ truy xuất OHLCV theo khung thời gian (interval) tuỳ chỉnh, Orderbook Horizontal chuẩn hoá đa cấp độ (L1-L10), lịch sử giao dịch (Intraday Trades với cơ chế map Taker/Maker) và báo giá tổng hợp 24h.
+
+| Method | Mô Tả | Return |
+|--------|------|--------|
+| `ohlcv()` | Giá lịch sử Klines đa khung thời gian (1m, 1h, 1d) | DataFrame |
+| `quote()` | Báo giá ticker lũy kế 24 giờ dạng Snapshot | DataFrame |
+| `intraday()` | Khớp lệnh chi tiết gần nhất (Time & Sales) | DataFrame |
+| `order_book()` | Sổ lệnh L1 - L10 (được dàn đều theo chiều ngang) | DataFrame |
+| `trade_history()` | Truy vấn lịch sử giao dịch bằng ID lệnh cũ (`/historicalTrades`) | DataFrame |
+| `vwap()` | Giá trung bình theo khối lượng (`/avgPrice`) | DataFrame |
+| `daily_stats()` | Thống kê phiên giao dịch (`/ticker/tradingDay`) | DataFrame |
+| `last_price()` | Mức giá khớp lệnh cuối cùng (`/ticker/price`) | DataFrame |
+| `rolling_stats()` | Thống kê theo cửa sổ trượt (Rolling Window Ticker) | DataFrame |
+| `reference_price(mode)` | Giá tham chiếu (`price`) hoặc cấu trúc tính toán (`calc`) | DataFrame |
+
+#### Ví dụ Truy xuất Crypto
 ```python
+from vnstock_data import Market
+
 mkt = Market()
-# Dữ liệu lịch sử Bitcoin (cần symbol_id từ MSN)
-df = mkt.crypto("BTC").ohlcv(start="2026-01-01", end="2026-03-01")
+crypto = mkt.crypto("BTCUSDT")
+
+# Báo giá Ticker hiện tại (24HR Rolling)
+df_quote = crypto.quote()
+
+# Dữ liệu OHLCV (ví dụ khung 1 ngày)
+df_ohlcv = crypto.ohlcv(interval="1d", limit=500)
+
+# Sổ lệnh (Order Book 10 mức giá Mua/Bán)
+df_orderbook = crypto.order_book(limit=10)
+
+# Lịch sử khớp lệnh trong phiên (Intraday)
+df_trades = crypto.intraday()
+
+# Trích xuất VWAP
+df_vwap = crypto.vwap()
 ```
 
-#### Forex Market
+#### Forex, Commodity & Global Index (Thị Trường Cầu & Hàng hóa)
 
+**Nguồn chính:** Dukascopy  
+**Registry Key:** `"market.forex"`, `"market.commodity"`, `"market.index"`
+
+Các domain Forex, Commodity, Index (Chỉ số Quốc Tế) giờ đây được hợp nhất kiến trúc và trực tiếp truy xuất Data **Tick/Phút liên tục** thông qua `Dukascopy`. Hệ thống còn cho phép cơ chế *Resampling* nội bộ đối với các khung cao (1h, 4h, 1d...).
+
+| Method | Tham Số Chính | Mô Tả | Return |
+|--------|---------------|------|--------|
+| `ohlcv()` | `interval`, `length`, `timezone` | Lịch sử giá theo khoảng thời gian tuỳ chọn | DataFrame |
+| `intraday()`| `timezone` | Dữ liệu Tick (Khớp lệnh) | DataFrame |
+
+> **🌟 Tính năng Timezone Configuration Parameter**:  
+> Lịch sử giá Dukascopy và Quốc tế mặc định được tự động map về quy chuẩn giờ Hệ thống Việt Nam (`Asia/Ho_Chi_Minh` / GMT+7). Tuy nhiên, có thể tuỳ ý ghi đè múi giờ gốc (UTC) hoặc bất kỳ giờ khu vực nào qua tham số `timezone`.
+
+#### Ví Dụ
 ```python
 mkt = Market()
-# Dữ liệu lịch sử cặp tiền tệ
-df = mkt.forex("USDVND").ohlcv(start="2026-01-01", end="2026-03-01")
+
+# Lịch sử tỷ giá tiền tệ theo giờ nội địa VN
+df_eurusd = mkt.forex("EURUSD").ohlcv(interval="1h", length=15)
+
+# Định dạng nến trả về đúng múi giờ quốc tế gốc UTC!
+df_utc_eurusd = mkt.forex("EURUSD", timezone="UTC").ohlcv(interval="1h", length=15)
+
+# Lịch sử giá vàng
+df_gold = mkt.commodity("XAUUSD").ohlcv(interval="1d", length=5)
+
+# Lấy dữ liệu Chỉ Số chứng khoán Mỹ (Dow Jones USA30) qua tham số scope="global"
+df_djia = mkt.index("USA30", scope="global").ohlcv(interval="4h")
 ```
 
-#### Commodity Market
-
-```python
-mkt = Market()
-# Dữ liệu lịch sử hàng hóa
-df = mkt.commodity("GC=F").ohlcv(start="2026-01-01", end="2026-03-01")
-```
-
-> **Tip**: Dùng `Reference().search.symbol("tên_tài_sản")` để tìm đúng mã symbol cho các thị trường quốc tế.
+> **Tip**: Có thể dùng `Reference().search.symbol("tên_tài_sản")` để tìm mã Symbol nếu không chắc chắn.
 
 ---
 

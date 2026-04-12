@@ -73,7 +73,7 @@ print(df_officers)
 |--------|---------|-------|
 | `list()` | - | Toàn bộ danh sách cổ phiếu |
 | `list_by_group()` | `group` | Cổ phiếu theo nhóm (VN30, HOSE...) |
-| `list_by_exchange()` | `exchange` | Cổ phiếu theo sàn (HSX, HNX...) |
+| `list_by_exchange()` | - | Cổ phiếu theo sàn (HSX, HNX...) |
 | `list_by_industry()` | - | Cổ phiếu theo ngành ICB |
 
 #### Ví dụ
@@ -92,9 +92,9 @@ print(f"Total symbols: {len(all_symbols)}")
 vn30 = ref.equity.list_by_group("VN30")
 print(vn30)
 
-# Cổ phiếu sàn HSX
-hsx_stocks = ref.equity.list_by_exchange("HSX")
-print(f"HSX symbols: {len(hsx_stocks)}")
+# Tất cả cổ phiếu organized by sàn
+exchange_stocks = ref.equity.list_by_exchange()
+print(f"Total symbols across exchanges: {len(exchange_stocks)}")
 ```
 
 ---

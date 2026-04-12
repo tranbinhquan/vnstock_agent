@@ -228,3 +228,78 @@ max_pe_date = pe_vnindex['pe'].idxmax()
 max_pe = pe_vnindex['pe'].max()
 print(f"Thị trường đắt nhất: {max_pe_date.date()} (P/E = {max_pe:.2f})")
 ```
+
+## Dữ Liệu Crypto
+
+Ngoài dữ liệu chứng khoán, lớp `Market` cũng cung cấp phương thức truy cập dữ liệu thị trường tiền mã hóa (Crypto). Dữ liệu này hỗ trợ lấy thông tin lịch sử giá (OHLCV), sổ lệnh (order book) và lịch sử giao dịch thời gian thực.
+
+### Khởi Tạo
+
+Sử dụng phương thức `crypto()` của `Market` với mã giao dịch tương ứng:
+
+```python
+from vnstock_data import Market
+
+mkt = Market()
+crypto = mkt.crypto("BTCUSDT")  # Nhập mã giao dịch, ví dụ: BTCUSDT, ETHUSDT
+```
+
+### Các Phương Thức Chính
+
+Các phương thức được thiết kế chuẩn hoá và trả về `pandas.DataFrame`.
+
+#### `ohlcv()` - Lịch Sử Giá (Bars)
+
+```python
+# Lấy dữ liệu nến theo khung thời gian
+df = crypto.ohlcv(interval="1d", limit=500)
+```
+
+**Tham Số**:
+- `interval` (str): Khung thời gian (`"1s"`, `"1m"` đến `"30m"`, `"1h"` đến `"12h"`, `"1d"`, `"3d"`, `"1w"`, `"1M"`). Default: `"1d"`
+- `limit` (int): Số nến hiển thị. Default: `500`
+- `start_time`, `end_time` (int, tuỳ chọn): Bộ lọc Unix timestamp (mili-giây).
+
+**Trả về**: DataFrame `[time, open, high, low, close, volume]`
+
+#### `trades()` - Lịch Sử Khớp Lệnh (Time & Sales)
+
+```python
+# Lịch sử khớp lệnh chi tiết (raw)
+df_raw = crypto.trades(limit=500, mode="raw")
+
+# Lịch sử khớp lệnh tổng hợp các lệnh cùng loại (aggregate)
+df_agg = crypto.trades(limit=500, mode="aggregate")
+```
+
+**Tham Số**:
+- `limit` (int): Số lượng lệnh hiển thị. Default: `500`
+- `mode` (str): Chế độ `"raw"` hoặc `"aggregate"`. Default: `"raw"`
+- `start_time`, `end_time` (int, tuỳ chọn): Dùng cho mode `aggregate` (mili-giây).
+
+**Trả về**: DataFrame `[time, price, volume, side, match_type, id]`
+
+#### `order_book()` - Sổ Lệnh (Market Depth)
+
+```python
+# Xem các mức giá đặt mua/bán (Bid/Ask) tốt nhất
+df = crypto.order_book(limit=10)
+```
+
+**Tham Số**:
+- `limit` (int): Số cấp giá (1, 5, 10, 20, 50, 100...). Default: `10`
+
+**Trả về**: DataFrame `[bid_price, bid_vol, ask_price, ask_vol, ...]`
+
+#### Dữ Liệu Tức Thời (Real-time Snapshots)
+
+```python
+# Xem thống kê trong 24 giờ qua (Giá mở, đỉnh, đáy, khối lượng)
+df_quote = crypto.quote()
+
+# Xem giá tham chiếu và tính toán
+df_ref = crypto.reference_price()
+
+# Xem giá khớp lệnh tại thời điểm hiện tại (nhẹ, tải nhanh)
+df_last = crypto.last_price()
+```

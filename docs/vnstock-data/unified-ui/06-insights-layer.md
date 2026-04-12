@@ -87,18 +87,82 @@ print(df_deals)
 
 #### Mô Tả
 
-Bộ lọc chứng khoán cung cấp dữ liệu toàn thị trường với hàng trăm chỉ tiêu tài chính. Người dùng có thể áp dụng logic lọc tùy chỉnh bằng Pandas.
+Bộ lọc cổ phiếu cho phép lọc nhanh danh sách các mã cổ phiếu bạn quan tâm với bộ tiêu chí được hỗ trợ. Người dùng có thể nạp điều kiện lọc khi gọi API bằng cách truyền `params` cấu hình bộ lọc nhằm rút ngắn thời gian và độ lớn dữ liệu tải về. (Mặc định nếu chạy không có tham số API sẽ kết hợp rất nhiều tiêu chí với biên độ lớn, đôi khi trả về rất ít kết quả).
 
 #### Phương Thức
 
 | Method | Tham Số | Mô Tả | Return |
 |--------|---------|-------|--------|
-| `criteria()` | `lang` | Danh sách giải thích tên cột (vi/en) | DataFrame |
-| `filter()` | `limit` | Dữ liệu screener toàn thị trường | DataFrame |
+| `criteria()` | `lang` | Danh sách giải thích tên cột và cấu hình (vi/en) | DataFrame |
+| `filter()` | `params`, `limit` | Dữ liệu screener theo bộ lọc hoặc toàn thị trường | DataFrame |
 
 **Parameters:**
+- `params` (Dict, optional): Payload bộ lọc tùy chỉnh. Nếu không truyền, hệ thống sẽ gọi bộ lọc mặc định rộng nhất.
 - `lang` (str): Ngôn ngữ ('vi' hoặc 'en'). Mặc định 'vi'.
 - `limit` (int): Số lượng bản ghi tối đa. Mặc định 2000.
+
+#### Bảng Tham Chiếu Cấu Trúc Bộ Lọc (Params Payload)
+
+Cấu trúc JSON cơ bản của `params` như sau:
+```json
+{
+    "filter": [
+        {
+            "name": "TÊN_TIÊU_CHÍ_TỪ_HÀM_CRITERIA",
+            "extraName": "TÊN_BỔ_SUNG_NẾU_CÓ",
+            "conditionOptions": [
+                {"type": "value", "value": "GIÁ_TRỊ_LỰA_CHỌN"}, 
+                {"from": 0, "to": 10} 
+            ]
+        }
+    ]
+}
+```
+
+Tất cả các tiêu chí lọc được hệ thống hỗ trợ bạn có thể tìm thấy ở bảng dưới đây (được rút trích từ bộ tiêu chí đầy đủ của hàm `criteria()`):
+
+| Phân Loại | Tiêu Chí | `field_name` | `extraName` / `extraName2` | Kiểu Filter (conditionOptions) | Ví dụ |
+|---|---|---|---|---|---|
+| **Thông tin chung** | Sàn giao dịch | `exchange` | | chọn giá trị (hsx, hnx, upcom) | `{"type": "value", "value": "hsx"}` |
+| | Nhóm ngành cấp 1 | `sectorLv1` | | chọn mã ngành | `{"type": "value", "value": "1000"}` |
+| | Vốn hóa (VND) | `marketCap` | | khoảng giá trị | `{"from": 0, "to": 1000000000}` |
+| | Thị giá | `marketPrice` | | khoảng giá trị | `{"from": 10000, "to": 50000}` |
+| **Giá & Khối lượng** | % Biến động giá hàng ngày | `dailyPriceChangePercent` | | khoảng giá trị | `{"from": -5, "to": 5}` |
+| | Giá trị GD trung bình | `adtv` | `30Days` | khoảng giá trị | `{"from": 1e9, "to": 5e9}` |
+| | Khối lượng TB | `avgVolume` | `30Days` | khoảng giá trị | `{"from": 100000, "to": 2000000}` |
+| | Đột biến KL (vs TB) | `esVolumeVsAvgVolume` | `30Days` | khoảng giá trị (%) | `{"from": 20, "to": 100}` |
+| | Tỷ suất lợi nhuận | `priceReturn` | `3Month` | khoảng giá trị (%) | `{"from": 5, "to": 20}` |
+| | Hiệu suất vs VN-Index | `outperformsIndex` | `3Month` | khoảng giá trị (%) | `{"from": 0, "to": 15}` |
+| | Mức biến động giá | `priceFluctuation` | `30Days` | khoảng giá trị (%) | `{"from": 0, "to": 10}` |
+| **Phân tích kỹ thuật** | Sức mạnh giá (Stock Strength) | `stockStrength` | | khoảng giá trị | `{"from": 50, "to": 100}` |
+| | Sức mạnh tương đối (RS) | `rs` | `3Month` | khoảng giá trị | `{"from": 70, "to": 100}` |
+| | RSI | `rsi` | | khoảng giá trị | `{"from": 30, "to": 70}` |
+| | Giá so với EMA | `priceEma` | `ema20` | khoảng giá trị (%) | `{"from": -5, "to": 5}` |
+| | Tương quan EMA20 & EMA50 | `ema20Ema50` | | khoảng giá trị (%) | `{"from": 0, "to": 5}` |
+| | Tương quan EMA50 & EMA200| `ema50Ema200` | | khoảng giá trị (%) | `{"from": 0, "to": 5}` |
+| | MACD | `macd` | | khoảng giá trị | `{"from": 0, "to": 5}` |
+| | MACD Histogram | `histogram` | | khoảng giá trị | `{"from": 0, "to": 1}` |
+| | ADX | `adx` | | khoảng giá trị | `{"from": 25, "to": 100}` |
+| | Xu hướng cổ phiếu | `stockTrend` | | chọn giá trị string | `{"type": "value", "value": "STRONG_UPTREND"}` |
+| | Xu hướng AO (Awesome Osc)| `aoTrend` | | chọn giá trị string | `{"type": "value", "value": "ABOVE_ZERO"}` |
+| **Định giá & Tài chính** | P/E cơ bản | `ttmPe` | | khoảng giá trị | `{"from": 5, "to": 15}` |
+| | P/B cơ bản | `ttmPb` | | khoảng giá trị | `{"from": 0.5, "to": 2.5}` |
+| | ROE | `ttmRoe` | | khoảng giá trị (%) | `{"from": 15, "to": 50}` |
+| | Tăng trưởng LNST (Mẹ) | `npatmiGrowth` | `Yoy`, `Qm1` (extraName2) | khoảng giá trị (%) | `{"from": 10, "to": 100}` |
+| | Tăng trưởng doanh thu | `revenueGrowth` | `Yoy` | khoảng giá trị (%) | `{"from": 10, "to": 100}` |
+| | Biên Lợi nhuận ròng | `netMargin` | | khoảng giá trị (%) | `{"from": 10, "to": 100}` |
+| | Biên Lợi nhuận gộp | `grossMargin` | | khoảng giá trị (%) | `{"from": 15, "to": 100}` |
+
+#### 🤖 Mẹo: Dùng AI Để Viết Bộ Lọc
+
+Do số lượng tiêu chí lọc rất lớn, bạn nên yêu cầu AI viết cấu trúc payload JSON `params` bằng cách cung cấp danh sách cột từ hàm `criteria()`.
+
+**Prompt mẫu:**
+> "Tôi đang dùng thư viện vnstock_data, hàm `ins.screener().filter(params=...)` cho phép truyền payload JSON để lọc cổ phiếu từ máy chủ. Dưới đây là danh sách tiêu chí lấy từ hàm `criteria()`: 
+> 
+> [Copy/paste kết quả từ hàm `ins.screener().criteria().to_csv()` hoặc `to_json()` vào đây]. 
+> 
+> Hãy soạn cho tôi một dictionary Python (cấu trúc JSON "filter") để lọc các cổ phiếu thuộc sàn HSX, có ROE > 15%, P/E < 10, và khối lượng giao dịch trung bình 30 ngày > 1,000,000."
 
 #### Ví Dụ
 
@@ -107,23 +171,66 @@ from vnstock_data import Insights
 
 ins = Insights()
 
-# ===== Xem Danh Sách Tiêu Chí =====
-criteria_df = ins.screener().criteria(lang="vi")
-print(criteria_df)
+# ===== 1. Lọc Trực Tiếp Qua API (Sử dụng params) =====
+custom_filter = {
+    "filter": [
+        {
+            "name": "exchange",
+            "conditionOptions": [{"type": "value", "value": "hsx"}]
+        },
+        {
+            "name": "ttmRoe",
+            "conditionOptions": [{"from": 15, "to": 100}]
+        },
+        {
+            "name": "ttmPe",
+            "conditionOptions": [{"from": 0, "to": 10}]
+        }
+    ]
+}
 
-# ===== Lọc Toàn Thị Trường =====
-# Lấy dữ liệu tất cả cổ phiếu với hàng trăm chỉ tiêu
+# Chỉ trả về kết quả thỏa mãn cấu hình trên
+df_filtered = ins.screener().filter(params=custom_filter)
+print(f"Cổ phiếu HSX, P/E < 10, ROE > 15: {len(df_filtered)}")
+print(df_filtered[['ticker', 'ttm_pe', 'ttm_roe']].head())
+
+# ===== 2. Kết hợp với Listing để tra cứu mã Ngành ICB =====
+from vnstock_data import Listing
+
+# Lấy danh sách phân ngành từ nguồn VCI
+lst_vci = Listing(source="vci")
+icb_df = lst_vci.industries_icb()
+
+# Tra cứu mã ICB cấp 1 (level = 1)
+lv1_sectors = icb_df[icb_df['level'] == 1]
+print("Danh sách mã ngành cấp 1:\n", lv1_sectors[['icb_code', 'icb_name']].head())
+
+# Giả sử '1000' là "Công nghiệp" (tùy thuộc vào kết quả trả về của icb_df)
+sector_code = "1000" 
+sector_filter = {
+    "filter": [
+        {
+            "name": "sectorLv1",
+            "conditionOptions": [{"type": "value", "value": sector_code}]
+        }
+    ]
+}
+
+df_sector = ins.screener().filter(params=sector_filter)
+print(f"\nCổ phiếu thuộc nhóm ngành {sector_code}: {len(df_sector)}")
+print(df_sector[['ticker', 'exchange', 'sector_lv1']].head())
+
+
+# ===== 3. Lọc Toàn Thị Trường & Phân Tích Bằng Pandas =====
+# Lấy mọi cổ phiếu với bộ lọc mặc định rộng nhất
 df_all = ins.screener().filter()
 print(f"Total stocks: {len(df_all)}")
-print(f"Total columns: {len(df_all.columns)}")
 
 # Lọc thủ công bằng Pandas
-# Cổ phiếu có P/E < 10 và ROE > 15%
 cheap_good = df_all[
-    (df_all['pe'] < 10) & (df_all['roe'] > 15)
+    (df_all['ttm_pe'] < 10) & (df_all['ttm_roe'] > 15)
 ]
-print(f"Cổ phiếu rẻ + chất lượng: {len(cheap_good)}")
-print(cheap_good[['ticker', 'pe', 'roe']].head(10))
+print(cheap_good[['ticker', 'ttm_pe', 'ttm_roe']].head())
 ```
 
 ---
